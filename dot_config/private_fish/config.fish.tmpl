@@ -1,0 +1,34 @@
+if status is-interactive
+{{- if eq .chezmoi.os "darwin" }}
+    # Version managers (macOS)
+    rbenv init - | source
+    pyenv init - | source
+{{- end }}
+
+    # Shell integrations
+    starship init fish | source
+    zoxide init fish --cmd cd | source
+    atuin init fish --disable-up-arrow | source
+
+    # Aliases
+    alias v="nvim"
+    alias vim="nvim"
+    alias g="git"
+    alias gs="git status"
+    alias gd="git diff"
+    alias lg="lazygit"
+
+    alias ls="eza --icons"
+    alias l="eza -la --icons --git"
+    alias ll="eza -l --icons --git"
+    alias tree="eza --tree --icons --level=2"
+    alias cat="bat"
+
+{{- if eq .chezmoi.os "darwin" }}
+    alias rebuild="darwin-rebuild switch --flake ~/.config/nix-config#macbook"
+{{- else if eq .chezmoi.os "linux" }}
+    alias rebuild="sudo nixos-rebuild switch --flake ~/.config/nix-config#thinkpad"
+{{- end }}
+end
+
+set PATH $PATH $HOME/.local/bin

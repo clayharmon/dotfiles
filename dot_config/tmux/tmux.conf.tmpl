@@ -1,0 +1,72 @@
+# Dracula-themed minimal tmux config
+
+# ── General ────────────────────────────────────────────────────────
+set -g default-terminal "tmux-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+set -g mouse on
+set -g base-index 1
+setw -g pane-base-index 1
+set -g renumber-windows on
+set -g escape-time 0
+set -g history-limit 50000
+set -g focus-events on
+set -g set-clipboard on
+
+# ── Prefix ─────────────────────────────────────────────────────────
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
+
+# ── Splits (vim-style) ────────────────────────────────────────────
+bind v split-window -h -c "#{pane_current_path}"
+bind s split-window -v -c "#{pane_current_path}"
+bind c new-window -c "#{pane_current_path}"
+
+# ── Navigation (vim-style) ────────────────────────────────────────
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# ── Resize (vim-style) ────────────────────────────────────────────
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+
+# ── Copy mode (vi) ────────────────────────────────────────────────
+setw -g mode-keys vi
+bind -T copy-mode-vi v send -X begin-selection
+{{- if eq .chezmoi.os "darwin" }}
+bind -T copy-mode-vi y send -X copy-pipe-and-cancel "pbcopy"
+{{- else }}
+bind -T copy-mode-vi y send -X copy-pipe-and-cancel "wl-copy"
+{{- end }}
+
+# ── Reload ─────────────────────────────────────────────────────────
+bind r source-file ~/.config/tmux/tmux.conf \; display "Config reloaded"
+
+# ── Dracula Theme ──────────────────────────────────────────────────
+set -g status-style "bg=#282a36,fg=#f8f8f2"
+set -g status-left "#[fg=#282a36,bg=#bd93f9,bold] #S #[fg=#bd93f9,bg=#282a36] "
+set -g status-left-length 30
+set -g status-right "#[fg=#6272a4]%a %d %b #[fg=#f8f8f2]%H:%M "
+set -g status-right-length 40
+
+# Window tabs
+setw -g window-status-format "#[fg=#6272a4] #I:#W "
+setw -g window-status-current-format "#[fg=#282a36,bg=#44475a,bold] #I:#W "
+
+# Pane borders
+set -g pane-border-style "fg=#44475a"
+set -g pane-active-border-style "fg=#bd93f9"
+
+# Message style
+set -g message-style "bg=#44475a,fg=#f8f8f2"
+set -g message-command-style "bg=#44475a,fg=#f8f8f2"
+
+# Mode style (copy mode highlight)
+setw -g mode-style "bg=#44475a,fg=#f8f8f2"
+
+# ── Status bar position ───────────────────────────────────────────
+set -g status-position bottom

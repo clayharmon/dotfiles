@@ -1,0 +1,29 @@
+# Font
+font-family = JetBrains Mono
+font-size = {{ if eq .chezmoi.os "darwin" }}16{{ else }}12{{ end }}
+
+# Dracula theme
+theme = Dracula
+
+# Window
+window-padding-x = 4
+window-padding-y = 4
+window-decoration = false
+background-opacity = 0.8
+background-blur-radius = 20
+
+# Cursor
+cursor-style = block
+cursor-style-blink = false
+
+# Behavior
+shell-integration = fish
+copy-on-select = clipboard
+confirm-close-surface = false
+quit-after-last-window-closed = true
+scrollback-limit = 10000
+{{- if eq .chezmoi.os "darwin" }}
+
+# macOS
+macos-option-as-alt = true
+{{- end }}

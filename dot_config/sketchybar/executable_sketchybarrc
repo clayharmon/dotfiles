@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# Dracula color palette
+BACKGROUND=0xff282a36
+CURRENT_LINE=0xff44475a
+FOREGROUND=0xfff8f8f2
+COMMENT=0xff6272a4
+CYAN=0xff8be9fd
+GREEN=0xff50fa7b
+PURPLE=0xffbd93f9
+RED=0xffff5555
+YELLOW=0xfff1fa8c
+
+PLUGIN_DIR="$CONFIG_DIR/plugins"
+FONT="JetBrainsMono Nerd Font"
+
+##### Bar Appearance #####
+sketchybar --bar \
+  position=top \
+  height=36 \
+  color=$BACKGROUND \
+  border_color=$COMMENT \
+  border_width=0 \
+  shadow=off \
+  margin=0 \
+  y_offset=0 \
+  padding_left=10 \
+  padding_right=10 \
+  topmost=window \
+  sticky=on \
+  font_smoothing=on
+
+##### Defaults #####
+default=(
+  icon.font="$FONT:Bold:16.0"
+  label.font="$FONT:Medium:14.0"
+  icon.color=$FOREGROUND
+  label.color=$FOREGROUND
+  icon.padding_left=6
+  icon.padding_right=4
+  label.padding_left=4
+  label.padding_right=6
+  padding_left=2
+  padding_right=2
+)
+sketchybar --default "${default[@]}"
+
+##### Aerospace Workspaces #####
+sketchybar --add event aerospace_workspace_change
+
+for sid in 1 2 3 4 5; do
+  sketchybar --add item space.$sid left \
+    --subscribe space.$sid aerospace_workspace_change \
+    --set space.$sid \
+      background.color=$CURRENT_LINE \
+      background.corner_radius=5 \
+      background.height=24 \
+      background.drawing=off \
+      icon.drawing=off \
+      label="$sid" \
+      label.color=$COMMENT \
+      label.font="$FONT:Bold:14.0" \
+      label.padding_left=8 \
+      label.padding_right=8 \
+      click_script="aerospace workspace $sid" \
+      script="$PLUGIN_DIR/aerospace.sh $sid"
+done
+
+##### Right Side Items #####
+
+# Clock
+sketchybar --add item clock right \
+  --set clock \
+    icon="" \
+    icon.color=$PURPLE \
+    label.color=$FOREGROUND \
+    update_freq=10 \
+    script="$PLUGIN_DIR/clock.sh"
+
+# Battery
+sketchybar --add item battery right \
+  --set battery \
+    icon.color=$GREEN \
+    label.color=$FOREGROUND \
+    update_freq=120 \
+    script="$PLUGIN_DIR/battery.sh" \
+  --subscribe battery system_woke power_source_change
+
+
+##### Force all scripts to run the first time #####
+sketchybar --update

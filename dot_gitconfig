@@ -1,0 +1,13 @@
+[safe]
+	directory = /home/coreboot/cb_build
+[user]
+	email = clay@clayharmon.me
+	signingkey = /Users/clayharmon/.ssh/id_ed25519.pub
+[init]
+	defaultBranch = main
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+[gpg "ssh"]
+	allowedSignersFile = /Users/clayharmon/.ssh/allowed_signers

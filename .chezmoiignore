@@ -1,0 +1,6 @@
+{{- if ne .chezmoi.os "darwin" }}
+# macOS-only configs
+.config/aerospace/
+.config/borders/
+.config/sketchybar/
+{{- end }}
