@@ -46,9 +46,13 @@ run "brew tap FelixKratz/formulae"
 brew("sketchybar", "borders")
 
 {{ else if eq .chezmoi.os "linux" -}}
+def yay(*pkgs)
+  run "yay -S --needed --noconfirm #{pkgs.join(" ")}"
+end
+
 shared = %w[
   neovim fish tmux starship eza bat ripgrep
-  zoxide atuin git-delta sd fzf jq lazygit docker
+  zoxide atuin git-delta sd fzf jq lazygit docker chromium
 ]
 
 if system("command -v pacman &>/dev/null")
@@ -56,11 +60,41 @@ if system("command -v pacman &>/dev/null")
   puts "Installing packages (Arch)..."
   pacman(*shared, *arch_extras)
 
+  # Install yay if not present
+  unless system("command -v yay &>/dev/null")
+    puts "Installing yay..."
+    run "sudo pacman -S --needed --noconfirm git base-devel"
+    run "git clone https://aur.archlinux.org/yay.git /tmp/yay && cd /tmp/yay && makepkg -si --noconfirm && rm -rf /tmp/yay"
+  end
+
+  # AUR packages
+  aur_apps = %w[
+    spotify
+    firefox-developer-edition
+    claude-desktop-bin
+  ]
+  puts "Installing AUR packages..."
+  yay(*aur_apps)
+
 elsif system("command -v dnf &>/dev/null")
-  fedora_extras = %w[fd-find gh jetbrains-mono-fonts-all]
+  fedora_extras = %w[fd-find gh jetbrains-mono-fonts-all ghostty]
   puts "Installing packages (Fedora)..."
   dnf(*shared, *fedora_extras)
+
+  # Spotify via negativo17 repo
+  puts "Installing Spotify..."
+  run "sudo dnf config-manager --add-repo=https://negativo17.org/repos/fedora-spotify.repo"
+  dnf("spotify-client")
+
+  # Firefox Developer Edition via Copr
+  puts "Installing Firefox Developer Edition..."
+  run "sudo dnf copr enable -y the4runner/firefox-dev"
+  dnf("firefox-developer-edition")
 end
+
+# Claude Code CLI (npm -- available after mise installs node in step 01)
+puts "Installing Claude Code CLI..."
+run "npm install -g @anthropic-ai/claude-code"
 
 {{ end -}}
 puts "Packages installed!"
