@@ -83,8 +83,8 @@ if system("command -v pacman &>/dev/null")
 elsif system("command -v dnf &>/dev/null")
   # Packages available in default Fedora repos
   repo_packages = %w[
-    neovim fish tmux eza bat fd-find ripgrep
-    zoxide atuin git-delta sd du-dust fzf jq
+    neovim fish tmux bat fd-find ripgrep
+    zoxide atuin git-delta du-dust fzf jq
     gh chromium jetbrains-mono-fonts-all
   ]
   puts "Installing repo packages (Fedora)..."
@@ -93,7 +93,7 @@ elsif system("command -v dnf &>/dev/null")
   # Copr repos for packages not in default repos
   puts "Enabling Copr repos..."
   run "sudo dnf copr enable -y atim/starship"
-  run "sudo dnf copr enable -y atim/lazygit"
+  run "sudo dnf copr enable -y dejan/lazygit"
   run "sudo dnf copr enable -y pgdev/ghostty"
 
   puts "Installing Copr packages..."
@@ -115,8 +115,9 @@ elsif system("command -v dnf &>/dev/null")
   dnf("firefox-developer-edition")
 
   # Tools not packaged for Fedora -- install via cargo
-  puts "Installing cargo packages (xh, aichat)..."
-  cargo_install("xh", "aichat")
+  # eza: removed from F42 repos; sd: removed from F42+ repos
+  puts "Installing cargo packages (eza, sd, xh, aichat)..."
+  cargo_install("eza", "sd", "xh", "aichat")
 end
 
 # Claude Code CLI (npm -- available after mise installs node in step 01)
