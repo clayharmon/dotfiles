@@ -1,6 +1,7 @@
 if status is-interactive
-    # mise auto-activates via brew vendor_conf.d (macOS)
-    # or add: mise activate fish | source (Linux)
+{{- if eq .chezmoi.os "linux" }}
+    mise activate fish | source
+{{- end }}
 
     # Shell integrations
     starship init fish | source
