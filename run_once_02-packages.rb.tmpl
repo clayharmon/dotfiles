@@ -32,7 +32,7 @@ cli_tools = %w[
 apps = %w[
   ghostty firefox@developer-edition aerospace
   karabiner-elements docker bitwarden spotify
-  claude font-jetbrains-mono-nerd-font
+  font-jetbrains-mono-nerd-font
 ]
 
 puts "Installing CLI tools..."
@@ -44,6 +44,9 @@ cask(*apps)
 puts "Installing macOS bar + borders..."
 run "brew tap FelixKratz/formulae"
 brew("sketchybar", "borders")
+
+puts "Installing Claude Code CLI..."
+run "npm install -g @anthropic-ai/claude-code"
 
 {{ else if eq .chezmoi.os "linux" -}}
 def yay(*pkgs)
@@ -71,7 +74,6 @@ if system("command -v pacman &>/dev/null")
   aur_apps = %w[
     spotify
     firefox-developer-edition
-    claude-desktop-bin
   ]
   puts "Installing AUR packages..."
   yay(*aur_apps)
