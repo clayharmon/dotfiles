@@ -2,6 +2,11 @@ if status is-interactive
 {{- if eq .chezmoi.os "linux" }}
     mise activate fish | source
 {{ end }}
+    # Auto-start tmux
+    if not set -q TMUX
+        tmux new-session -A -s main
+    end
+
     # Shell integrations
     starship init fish | source
     zoxide init fish --cmd cd | source
