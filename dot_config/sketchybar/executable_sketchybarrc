@@ -48,6 +48,7 @@ sketchybar --default "${default[@]}"
 ##### Aerospace Workspaces #####
 sketchybar --add event aerospace_workspace_change
 
+# Laptop workspaces (1-5)
 for sid in 1 2 3 4 5; do
   sketchybar --add item space.$sid left \
     --subscribe space.$sid aerospace_workspace_change \
@@ -65,6 +66,39 @@ for sid in 1 2 3 4 5; do
       click_script="aerospace workspace $sid" \
       script="$PLUGIN_DIR/aerospace.sh $sid"
 done
+
+# External monitor workspaces (6-9) -- only show if secondary monitor connected
+MONITOR_COUNT=$(aerospace list-monitors 2>/dev/null | wc -l | tr -d ' ')
+
+if [ "$MONITOR_COUNT" -gt 1 ]; then
+  sketchybar --add item separator left \
+    --set separator \
+      icon="│" \
+      icon.color=$COMMENT \
+      icon.font="$FONT:Bold:16.0" \
+      icon.padding_left=4 \
+      icon.padding_right=4 \
+      label.drawing=off \
+      background.drawing=off
+
+  for sid in 6 7 8 9; do
+    sketchybar --add item space.$sid left \
+      --subscribe space.$sid aerospace_workspace_change \
+      --set space.$sid \
+        background.color=$CURRENT_LINE \
+        background.corner_radius=5 \
+        background.height=24 \
+        background.drawing=off \
+        icon.drawing=off \
+        label="$sid" \
+        label.color=$COMMENT \
+        label.font="$FONT:Bold:14.0" \
+        label.padding_left=8 \
+        label.padding_right=8 \
+        click_script="aerospace workspace $sid" \
+        script="$PLUGIN_DIR/aerospace.sh $sid"
+  done
+fi
 
 ##### Right Side Items #####
 

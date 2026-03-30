@@ -53,15 +53,19 @@ def yay(*pkgs)
   run "yay -S --needed --noconfirm #{pkgs.join(" ")}"
 end
 
-shared = %w[
-  neovim fish tmux starship eza bat ripgrep
-  zoxide atuin git-delta sd fzf jq lazygit docker chromium
-]
+def cargo_install(*pkgs)
+  pkgs.each { |pkg| run "cargo install #{pkg}" }
+end
 
 if system("command -v pacman &>/dev/null")
-  arch_extras = %w[fd xh dust github-cli ghostty aichat ttf-jetbrains-mono-nerd]
+  packages = %w[
+    neovim fish tmux starship eza bat fd ripgrep
+    zoxide atuin git-delta sd xh dust fzf jq
+    lazygit docker chromium github-cli ghostty aichat
+    ttf-jetbrains-mono-nerd
+  ]
   puts "Installing packages (Arch)..."
-  pacman(*shared, *arch_extras)
+  pacman(*packages)
 
   # Install yay if not present
   unless system("command -v yay &>/dev/null")
@@ -71,17 +75,32 @@ if system("command -v pacman &>/dev/null")
   end
 
   # AUR packages
-  aur_apps = %w[
-    spotify
-    firefox-developer-edition
-  ]
   puts "Installing AUR packages..."
-  yay(*aur_apps)
+  yay("spotify", "firefox-developer-edition")
 
 elsif system("command -v dnf &>/dev/null")
-  fedora_extras = %w[fd-find gh jetbrains-mono-fonts-all ghostty]
-  puts "Installing packages (Fedora)..."
-  dnf(*shared, *fedora_extras)
+  # Packages available in default Fedora repos
+  repo_packages = %w[
+    neovim fish tmux eza bat fd-find ripgrep
+    zoxide atuin git-delta sd du-dust fzf jq
+    gh chromium jetbrains-mono-fonts-all
+  ]
+  puts "Installing repo packages (Fedora)..."
+  dnf(*repo_packages)
+
+  # Copr repos for packages not in default repos
+  puts "Enabling Copr repos..."
+  run "sudo dnf copr enable -y atim/starship"
+  run "sudo dnf copr enable -y atim/lazygit"
+  run "sudo dnf copr enable -y pgdev/ghostty"
+
+  puts "Installing Copr packages..."
+  dnf("starship", "lazygit", "ghostty")
+
+  # Docker CE
+  puts "Installing Docker CE..."
+  run "sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo"
+  dnf("docker-ce", "docker-ce-cli", "containerd.io", "docker-buildx-plugin", "docker-compose-plugin")
 
   # Spotify via negativo17 repo
   puts "Installing Spotify..."
@@ -92,6 +111,10 @@ elsif system("command -v dnf &>/dev/null")
   puts "Installing Firefox Developer Edition..."
   run "sudo dnf copr enable -y the4runner/firefox-dev"
   dnf("firefox-developer-edition")
+
+  # Tools not packaged for Fedora -- install via cargo
+  puts "Installing cargo packages (xh, aichat)..."
+  cargo_install("xh", "aichat")
 end
 
 # Claude Code CLI (npm -- available after mise installs node in step 01)

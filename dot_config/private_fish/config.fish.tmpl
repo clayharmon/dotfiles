@@ -1,8 +1,7 @@
 if status is-interactive
 {{- if eq .chezmoi.os "linux" }}
     mise activate fish | source
-{{- end }}
-
+{{ end }}
     # Shell integrations
     starship init fish | source
     zoxide init fish --cmd cd | source
@@ -21,12 +20,6 @@ if status is-interactive
     alias ll="eza -l --icons --git"
     alias tree="eza --tree --icons --level=2"
     alias cat="bat"
-
-{{- if eq .chezmoi.os "darwin" }}
-    alias rebuild="darwin-rebuild switch --flake ~/.config/nix-config#macbook"
-{{- else if eq .chezmoi.os "linux" }}
-    alias rebuild="sudo nixos-rebuild switch --flake ~/.config/nix-config#thinkpad"
-{{- end }}
 end
 
 set PATH $PATH $HOME/.local/bin

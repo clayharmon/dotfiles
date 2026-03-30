@@ -9,6 +9,7 @@ set -e
 if ! command -v brew &>/dev/null; then
   echo "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
 # Install mise
@@ -20,7 +21,13 @@ if ! command -v mise &>/dev/null; then
   curl https://mise.run | sh
 fi
 
+# Ensure mise is on PATH for this session
+export PATH="$HOME/.local/bin:$PATH"
+
 {{ end -}}
+
+# Activate mise in this shell so installed runtimes are immediately available
+eval "$(mise activate bash)"
 
 # Install language runtimes
 echo "Installing runtimes via mise..."
@@ -34,6 +41,8 @@ mise settings add idiomatic_version_file_enable_tools ruby
 # Install Rust
 if ! command -v rustup &>/dev/null; then
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  # Make cargo available in this session
+  source "$HOME/.cargo/env"
 {{ if eq .chezmoi.os "linux" -}}
   rustup default stable
 {{ end -}}

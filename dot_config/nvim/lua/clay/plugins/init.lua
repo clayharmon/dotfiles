@@ -126,11 +126,18 @@ return {
     -- Claude Code <-> Neovim integration (WebSocket protocol, same as VS Code extension)
     {
         "coder/claudecode.nvim",
-        config = true,
+        opts = {
+            terminal = {
+                split_side = "right",
+                split_width_percentage = 0.4,
+            },
+        },
         keys = {
             { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude Code" },
+            { "<leader>aB", "<cmd>ClaudeCode --dangerously-skip-permissions<cr>", desc = "Claude Code (bypass perms)" },
             { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
             { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume session" },
+            { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue last session" },
             { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send selection to Claude" },
             { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add buffer to context" },
         },

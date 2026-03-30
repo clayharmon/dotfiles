@@ -36,5 +36,13 @@ vim.filetype.add({
     extension = {
         mdx = "mdx",
     },
+    pattern = {
+        -- chezmoi templates: highlight based on inner file type
+        [".*%.sh%.tmpl"] = "bash",
+        [".*%.rb%.tmpl"] = "ruby",
+        [".*%.fish%.tmpl"] = "fish",
+        [".*%.toml%.tmpl"] = "toml",
+        [".*%.conf%.tmpl"] = "conf",
+    },
 })
 vim.treesitter.language.register("markdown", "mdx")
