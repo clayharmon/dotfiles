@@ -34,6 +34,18 @@ bind -r J resize-pane -D 5
 bind -r K resize-pane -U 5
 bind -r L resize-pane -R 5
 
+# ── Layouts ───────────────────────────────────────────────────────
+bind Space next-layout
+bind e select-layout even-horizontal
+bind E select-layout even-vertical
+bind m select-layout main-vertical
+bind M select-layout main-horizontal
+
+# ── Swap/reposition panes ─────────────────────────────────────────
+bind > swap-pane -D
+bind < swap-pane -U
+bind Enter swap-pane -s '{top-left}' \; select-pane -t '{top-left}'
+
 # ── Copy mode (vi) ────────────────────────────────────────────────
 setw -g mode-keys vi
 bind -T copy-mode-vi v send -X begin-selection
