@@ -1,0 +1,66 @@
+#!/usr/bin/env ruby
+# Step 2: Install all CLI tools and applications
+
+def run(cmd)
+  puts "=> #{cmd}"
+  system(cmd) || abort("Failed: #{cmd}")
+end
+
+def brew(*pkgs)
+  run "brew install #{pkgs.join(" ")}"
+end
+
+def cask(*pkgs)
+  run "brew install --cask #{pkgs.join(" ")}"
+end
+
+def pacman(*pkgs)
+  run "sudo pacman -S --needed --noconfirm #{pkgs.join(" ")}"
+end
+
+def dnf(*pkgs)
+  run "sudo dnf install -y #{pkgs.join(" ")}"
+end
+
+{{ if eq .chezmoi.os "darwin" -}}
+cli_tools = %w[
+  neovim fish tmux starship eza bat fd ripgrep
+  zoxide atuin git-delta sd xh dust fzf jq
+  lazygit gh aichat
+]
+
+apps = %w[
+  ghostty firefox@developer-edition aerospace
+  karabiner-elements docker bitwarden spotify
+  discord slack font-jetbrains-mono-nerd-font
+]
+
+puts "Installing CLI tools..."
+brew(*cli_tools)
+
+puts "Installing apps..."
+cask(*apps)
+
+puts "Installing macOS bar + borders..."
+run "brew tap FelixKratz/formulae"
+brew("sketchybar", "borders")
+
+{{ else if eq .chezmoi.os "linux" -}}
+shared = %w[
+  neovim fish tmux starship eza bat ripgrep
+  zoxide atuin git-delta sd fzf jq lazygit docker
+]
+
+if system("command -v pacman &>/dev/null")
+  arch_extras = %w[fd xh dust github-cli ghostty aichat ttf-jetbrains-mono-nerd]
+  puts "Installing packages (Arch)..."
+  pacman(*shared, *arch_extras)
+
+elsif system("command -v dnf &>/dev/null")
+  fedora_extras = %w[fd-find gh jetbrains-mono-fonts-all]
+  puts "Installing packages (Fedora)..."
+  dnf(*shared, *fedora_extras)
+end
+
+{{ end -}}
+puts "Packages installed!"

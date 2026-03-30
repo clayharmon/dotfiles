@@ -1,9 +1,6 @@
 if status is-interactive
-{{- if eq .chezmoi.os "darwin" }}
-    # Version managers (macOS)
-    rbenv init - | source
-    pyenv init - | source
-{{- end }}
+    # mise auto-activates via brew vendor_conf.d (macOS)
+    # or add: mise activate fish | source (Linux)
 
     # Shell integrations
     starship init fish | source

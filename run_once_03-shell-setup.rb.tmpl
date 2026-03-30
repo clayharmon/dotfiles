@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+# Step 3: Set fish as default shell
+
+fish_path = `which fish 2>/dev/null`.strip
+
+if fish_path.empty?
+  puts "Fish not found, skipping shell setup"
+  exit 0
+end
+
+begin
+  shells = File.read("/etc/shells")
+rescue
+  shells = ""
+end
+
+unless shells.include?(fish_path)
+  puts "Adding fish to /etc/shells..."
+  system("echo '#{fish_path}' | sudo tee -a /etc/shells")
+end
+
+unless ENV["SHELL"] == fish_path
+  puts "Setting fish as default shell..."
+  system("chsh -s '#{fish_path}'")
+end
+
+puts "Shell setup complete!"

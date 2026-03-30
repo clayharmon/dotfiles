@@ -1,0 +1,42 @@
+#!/bin/bash
+# Step 1: Package manager, mise, and language runtimes
+# This runs first so Ruby/Node/Python are available for later scripts
+
+set -e
+
+{{ if eq .chezmoi.os "darwin" -}}
+# Install Homebrew
+if ! command -v brew &>/dev/null; then
+  echo "Installing Homebrew..."
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Install mise
+brew install mise
+
+{{ else if eq .chezmoi.os "linux" -}}
+# Install mise
+if ! command -v mise &>/dev/null; then
+  curl https://mise.run | sh
+fi
+
+{{ end -}}
+
+# Install language runtimes
+echo "Installing runtimes via mise..."
+mise use --global node@lts
+mise use --global python@3.12
+mise use --global ruby@3.4
+mise settings add idiomatic_version_file_enable_tools node
+mise settings add idiomatic_version_file_enable_tools python
+mise settings add idiomatic_version_file_enable_tools ruby
+
+# Install Rust
+if ! command -v rustup &>/dev/null; then
+  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+{{ if eq .chezmoi.os "linux" -}}
+  rustup default stable
+{{ end -}}
+fi
+
+echo "Bootstrap complete! mise + runtimes + rust ready."

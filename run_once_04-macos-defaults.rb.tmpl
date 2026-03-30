@@ -1,0 +1,67 @@
+#!/usr/bin/env ruby
+# Step 4: macOS system preferences
+
+{{ if ne .chezmoi.os "darwin" -}}
+exit 0
+{{ end -}}
+
+def defaults(domain, key, type, value)
+  system("defaults write #{domain} #{key} -#{type} #{value}")
+end
+
+puts "Applying macOS defaults..."
+
+# Dock
+defaults "com.apple.dock", "autohide", "bool", "true"
+defaults "com.apple.dock", "autohide-delay", "float", "0"
+defaults "com.apple.dock", "autohide-time-modifier", "float", "0.2"
+defaults "com.apple.dock", "show-recents", "bool", "false"
+defaults "com.apple.dock", "mru-spaces", "bool", "false"
+defaults "com.apple.dock", "tilesize", "int", "48"
+
+# Keyboard
+defaults "NSGlobalDomain", "InitialKeyRepeat", "int", "15"
+defaults "NSGlobalDomain", "KeyRepeat", "int", "2"
+defaults "NSGlobalDomain", "AppleInterfaceStyle", "string", "Dark"
+
+# Disable autocorrect nonsense
+%w[
+  NSAutomaticCapitalizationEnabled
+  NSAutomaticDashSubstitutionEnabled
+  NSAutomaticPeriodSubstitutionEnabled
+  NSAutomaticQuoteSubstitutionEnabled
+  NSAutomaticSpellingCorrectionEnabled
+].each do |key|
+  defaults "NSGlobalDomain", key, "bool", "false"
+end
+
+# Finder
+defaults "com.apple.finder", "AppleShowAllFiles", "bool", "true"
+defaults "com.apple.finder", "AppleShowAllExtensions", "bool", "true"
+defaults "com.apple.finder", "FXEnableExtensionChangeWarning", "bool", "false"
+defaults "com.apple.finder", "FXPreferredViewStyle", "string", "Nlsv"
+defaults "com.apple.finder", "ShowPathbar", "bool", "true"
+defaults "com.apple.finder", "ShowStatusBar", "bool", "true"
+
+# Disable DS_Store on network/USB
+defaults "com.apple.desktopservices", "DSDontWriteNetworkStores", "bool", "true"
+defaults "com.apple.desktopservices", "DSDontWriteUSBStores", "bool", "true"
+
+# Hide menu bar
+defaults "NSGlobalDomain", "_HIHideMenuBar", "bool", "true"
+
+# Disable ad tracking
+defaults "com.apple.AdLib", "allowApplePersonalizedAdvertising", "bool", "false"
+
+# Screenshots
+defaults "com.apple.screencapture", "type", "string", "png"
+defaults "com.apple.screencapture", "disable-shadow", "bool", "true"
+
+# Start services
+system "brew services start felixkratz/formulae/sketchybar 2>/dev/null"
+system "brew services start felixkratz/formulae/borders 2>/dev/null"
+
+# Restart affected apps
+system "killall Dock Finder 2>/dev/null"
+
+puts "macOS defaults applied!"
