@@ -1,0 +1,110 @@
+#!/bin/bash
+# Step 5: Firefox Developer Edition — policies + user preferences
+# policies.json: auto-install extensions, disable telemetry/sponsored stuff
+# user.js: about:config preferences (UI, new tab, dark mode, etc.)
+
+set -e
+
+# ── policies.json ─────────────────────────────────────────────────
+{{ if eq .chezmoi.os "darwin" -}}
+POLICY_DIR="/Library/Application Support/Mozilla/policies"
+{{ else if eq .chezmoi.os "linux" -}}
+POLICY_DIR="/etc/firefox/policies"
+{{ end -}}
+
+echo "Installing Firefox policies..."
+sudo mkdir -p "$POLICY_DIR"
+sudo tee "$POLICY_DIR/policies.json" > /dev/null << 'POLICY'
+{
+  "policies": {
+    "ExtensionSettings": {
+      "uBlock0@raymondhill.net": {
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi",
+        "installation_mode": "normal_installed"
+      },
+      "addon@darkreader.org": {
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi",
+        "installation_mode": "normal_installed"
+      },
+      "{446900e4-71c2-419f-a6a7-df9c091e268b}": {
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi",
+        "installation_mode": "normal_installed"
+      }
+    },
+    "DisableTelemetry": true,
+    "DisablePocket": true,
+    "DisableFirefoxStudies": true,
+    "DontCheckDefaultBrowser": true,
+    "NoDefaultBookmarks": true,
+    "OfferToSaveLogins": false
+  }
+}
+POLICY
+
+# ── user.js ───────────────────────────────────────────────────────
+# Find the dev-edition-default profile directory
+{{ if eq .chezmoi.os "darwin" -}}
+FF_DIR="$HOME/Library/Application Support/Firefox"
+{{ else if eq .chezmoi.os "linux" -}}
+FF_DIR="$HOME/.mozilla/firefox"
+{{ end -}}
+
+PROFILE_DIR=""
+if [ -f "$FF_DIR/profiles.ini" ]; then
+  # Find the dev-edition-default profile path
+  PROFILE_REL=$(grep -A2 'Name=dev-edition-default' "$FF_DIR/profiles.ini" | grep 'Path=' | cut -d= -f2)
+  if [ -n "$PROFILE_REL" ]; then
+    PROFILE_DIR="$FF_DIR/$PROFILE_REL"
+  fi
+fi
+
+# Fall back to any profile ending in .dev-edition-default
+if [ -z "$PROFILE_DIR" ] || [ ! -d "$PROFILE_DIR" ]; then
+  PROFILE_DIR=$(find "$FF_DIR" -maxdepth 1 -name "*.dev-edition-default" -type d 2>/dev/null | head -1)
+fi
+
+if [ -z "$PROFILE_DIR" ] || [ ! -d "$PROFILE_DIR" ]; then
+  echo "Warning: Firefox Developer Edition profile not found, skipping user.js"
+  echo "Run Firefox once to create a profile, then re-run: chezmoi apply"
+  exit 0
+fi
+
+echo "Installing user.js to $PROFILE_DIR..."
+cat > "$PROFILE_DIR/user.js" << 'USERJS'
+// Managed by chezmoi — manual edits will be overwritten
+
+// ── Homepage & new tab ───────────────────────────────────────────
+user_pref("browser.startup.homepage", "https://start.duckduckgo.com/");
+user_pref("browser.newtabpage.enabled", false);
+
+// ── Dark theme ───────────────────────────────────────────────────
+user_pref("browser.theme.content-theme", 0);
+user_pref("browser.theme.toolbar-theme", 0);
+user_pref("layout.css.prefers-color-scheme.content-override", 0);
+
+// ── Disable sponsored/suggested content ──────────────────────────
+user_pref("browser.newtabpage.activity-stream.showSponsored", false);
+user_pref("browser.newtabpage.activity-stream.showSponsoredCheckboxes", false);
+user_pref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
+user_pref("browser.newtabpage.activity-stream.feeds.section.topstories", false);
+user_pref("browser.newtabpage.activity-stream.feeds.topsites", false);
+user_pref("browser.newtabpage.activity-stream.showSearch", false);
+user_pref("browser.newtabpage.activity-stream.showWeather", false);
+user_pref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.addons", false);
+user_pref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features", false);
+user_pref("browser.urlbar.suggest.quicksuggest.all", false);
+user_pref("browser.urlbar.suggest.quicksuggest.nonsponsored", false);
+user_pref("browser.urlbar.suggest.quicksuggest.sponsored", false);
+user_pref("browser.urlbar.suggest.recentsearches", false);
+user_pref("browser.urlbar.shortcuts.actions", false);
+
+// ── Privacy ──────────────────────────────────────────────────────
+user_pref("signon.rememberSignons", false);
+
+// ── UI cleanup ───────────────────────────────────────────────────
+user_pref("browser.tabs.hoverPreview.showThumbnails", false);
+user_pref("browser.tabs.groups.smart.userEnabled", false);
+user_pref("sidebar.visibility", "hide-sidebar");
+USERJS
+
+echo "Firefox setup complete!"
