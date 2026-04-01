@@ -34,17 +34,23 @@ return {
     },
     {
         "nvim-treesitter/nvim-treesitter",
+        branch = "main",
+        lazy = false,
         build = ":TSUpdate",
         config = function()
-            require('nvim-treesitter.configs').setup({
-                ensure_installed = { "ruby", "javascript", "typescript", "c", "lua", "vim", "vimdoc", "rust", "nix" },
-                sync_install = false,
-                auto_install = true,
+            require('nvim-treesitter').setup({})
+            require('nvim-treesitter').install({
+                "ruby", "javascript", "typescript", "c", "lua", "vim",
+                "vimdoc", "rust", "nix", "markdown", "markdown_inline",
+                "json", "yaml", "toml", "html", "css", "bash", "fish",
+            })
 
-                highlight = {
-                    enable = true,
-                    additional_vim_regex_highlighting = false,
-                },
+            -- Neovim 0.12: highlighting is enabled via vim.treesitter.start()
+            -- Enable treesitter highlighting for all filetypes with installed parsers
+            vim.api.nvim_create_autocmd('FileType', {
+                callback = function(args)
+                    pcall(vim.treesitter.start, args.buf)
+                end,
             })
         end
     },
@@ -84,9 +90,19 @@ return {
         end
     },
     {
-        'MeanderingProgrammer/render-markdown.nvim',
-        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-        opts = {},
+        'iamcco/markdown-preview.nvim',
+        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+        ft = { "markdown" },
+        build = "cd app && npm install",
+        config = function()
+            vim.g.mkdp_theme = 'dark'
+            vim.keymap.set('n', '<leader>mp', '<cmd>MarkdownPreviewToggle<cr>', { desc = "Markdown preview (browser)" })
+            -- Glow preview in tmux popup
+            vim.keymap.set('n', '<leader>mg', function()
+                local file = vim.fn.expand('%:p')
+                vim.cmd('silent !tmux display-popup -E -w 80\\% -h 80\\% -b rounded -S "fg=\\#bd93f9" "/opt/homebrew/bin/glow -p \'' .. file .. '\'"')
+            end, { desc = "Markdown preview (terminal)" })
+        end,
     },
     {
         'stevearc/oil.nvim',

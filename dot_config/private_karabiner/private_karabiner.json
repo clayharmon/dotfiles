@@ -36,23 +36,7 @@
                         ]
                     },
                     {
-                        "description": "Open Ghostty by left option + return",
-                        "manipulators": [
-                            {
-                                "from": {
-                                    "key_code": "return_or_enter",
-                                    "modifiers": {
-                                        "mandatory": ["left_option"],
-                                        "optional": ["caps_lock"]
-                                    }
-                                },
-                                "to": [{ "software_function": { "open_application": { "file_path": "/Applications/Ghostty.app" } } }],
-                                "type": "basic"
-                            }
-                        ]
-                    },
-                    {
-                        "description": "Launch choose launcher by cmd + space",
+                        "description": "Launcher via cmd + space",
                         "manipulators": [
                             {
                                 "from": {
@@ -62,7 +46,23 @@
                                         "optional": ["caps_lock"]
                                     }
                                 },
-                                "to": [{ "shell_command": "/Users/clayharmon/.config/choose/launcher.sh" }],
+                                "to": [{ "key_code": "f19" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
+                        "description": "Open Ghostty by cmd + return",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "return_or_enter",
+                                    "modifiers": {
+                                        "mandatory": ["command"],
+                                        "optional": ["caps_lock"]
+                                    }
+                                },
+                                "to": [{ "software_function": { "open_application": { "file_path": "/Applications/Ghostty.app" } } }],
                                 "type": "basic"
                             }
                         ]

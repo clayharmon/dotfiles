@@ -51,7 +51,6 @@ sketchybar --add event aerospace_workspace_change
 # Laptop workspaces (1-5)
 for sid in 1 2 3 4 5; do
   sketchybar --add item space.$sid left \
-    --subscribe space.$sid aerospace_workspace_change \
     --set space.$sid \
       background.color=$CURRENT_LINE \
       background.corner_radius=5 \
@@ -63,8 +62,7 @@ for sid in 1 2 3 4 5; do
       label.font="$FONT:Bold:14.0" \
       label.padding_left=8 \
       label.padding_right=8 \
-      click_script="aerospace workspace $sid" \
-      script="$PLUGIN_DIR/aerospace.sh $sid"
+      click_script="aerospace workspace $sid"
 done
 
 # External monitor workspaces (6-9) -- only show if secondary monitor connected
@@ -83,7 +81,6 @@ if [ "$MONITOR_COUNT" -gt 1 ]; then
 
   for sid in 6 7 8 9; do
     sketchybar --add item space.$sid left \
-      --subscribe space.$sid aerospace_workspace_change \
       --set space.$sid \
         background.color=$CURRENT_LINE \
         background.corner_radius=5 \
@@ -95,10 +92,16 @@ if [ "$MONITOR_COUNT" -gt 1 ]; then
         label.font="$FONT:Bold:14.0" \
         label.padding_left=8 \
         label.padding_right=8 \
-        click_script="aerospace workspace $sid" \
-        script="$PLUGIN_DIR/aerospace.sh $sid"
+        click_script="aerospace workspace $sid"
   done
 fi
+
+# Single trigger handles ALL workspace updates in one batch
+sketchybar --add item space_trigger left \
+  --subscribe space_trigger aerospace_workspace_change front_app_switched \
+  --set space_trigger \
+    drawing=off \
+    script="$PLUGIN_DIR/aerospace.sh"
 
 ##### Right Side Items #####
 
@@ -120,6 +123,15 @@ sketchybar --add item battery right \
     script="$PLUGIN_DIR/battery.sh" \
   --subscribe battery system_woke power_source_change
 
+
+# Search (triggers hammerspoon launcher)
+sketchybar --add item search right \
+  --set search \
+    icon="/" \
+    icon.color=$PURPLE \
+    icon.font="$FONT:Bold:18.0" \
+    label.drawing=off \
+    click_script="open -g hammerspoon://launcher"
 
 ##### Force all scripts to run the first time #####
 sketchybar --update

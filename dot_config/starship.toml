@@ -20,7 +20,7 @@ style = "red"
 format = "[ $all_status$ahead_behind]($style)"
 
 [character]
-success_symbol = "[\\$](white)"
+success_symbol = "[\\$](#50fa7b)"
 error_symbol = "[\\$](red)"
 vimcmd_symbol = "[\\$](green)"
 
