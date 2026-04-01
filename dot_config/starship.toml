@@ -1,0 +1,31 @@
+format = """
+$directory$fill$git_branch$git_status
+$character"""
+
+[fill]
+symbol = " "
+
+[directory]
+style = "cyan bold"
+truncation_length = 3
+truncate_to_repo = true
+
+[git_branch]
+style = "purple"
+format = "[$symbol$branch]($style)"
+symbol = " "
+
+[git_status]
+style = "red"
+format = "[ $all_status$ahead_behind]($style)"
+
+[character]
+success_symbol = "[\\$](white)"
+error_symbol = "[\\$](red)"
+vimcmd_symbol = "[\\$](green)"
+
+[cmd_duration]
+disabled = true
+
+[nix_shell]
+disabled = true
