@@ -4,6 +4,20 @@
             "complex_modifications": {
                 "rules": [
                     {
+                        "description": "Caps lock to ctrl (held) / escape (tapped)",
+                        "manipulators": [
+                            {
+                                "from": {
+                                    "key_code": "caps_lock",
+                                    "modifiers": { "optional": ["any"] }
+                                },
+                                "to": [{ "key_code": "left_control", "lazy": true }],
+                                "to_if_alone": [{ "key_code": "escape" }],
+                                "type": "basic"
+                            }
+                        ]
+                    },
+                    {
                         "description": "Open messages by left option + m",
                         "manipulators": [
                             {
