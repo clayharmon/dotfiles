@@ -3,6 +3,7 @@
 # ── General ────────────────────────────────────────────────────────
 set -g default-terminal "tmux-256color"
 set -ag terminal-overrides ",xterm-256color:RGB"
+set -ag terminal-features ",xterm-256color:hyperlinks"
 set -g mouse on
 set -g base-index 1
 setw -g pane-base-index 1
@@ -54,6 +55,35 @@ bind -T copy-mode-vi y send -X copy-pipe-and-cancel "pbcopy"
 {{- else }}
 bind -T copy-mode-vi y send -X copy-pipe-and-cancel "wl-copy"
 {{- end }}
+
+# ── Fuzzy finders (fzf + bat popups) ──────────────────────────────
+FZF_DRACULA="--color='bg:#282a36,fg:#f8f8f2,hl:#bd93f9,bg+:#44475a,fg+:#f8f8f2,hl+:#ff79c6,info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6,marker:#ff79c6,spinner:#ffb86c,header:#6272a4'"
+
+# Find files -> open in nvim
+bind f display-popup -E -w 80% -h 80% -b rounded -S "fg=#bd93f9" \
+  "fd --type f --hidden --follow --exclude .git --exclude node_modules --exclude .cache --exclude Library --exclude .local . $HOME | \
+   fzf --preview 'bat --color=always --style=numbers --line-range=:200 {}' \
+       --preview-window=right:50% \
+       --header 'find files' \
+       --color='bg:#282a36,fg:#f8f8f2,hl:#bd93f9,bg+:#44475a,fg+:#f8f8f2,hl+:#ff79c6,info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6,marker:#ff79c6,spinner:#ffb86c,header:#6272a4' \
+   | xargs -I{} tmux new-window nvim {}"
+
+# Grep content -> open in nvim at line (starts empty, searches as you type)
+bind g display-popup -E -w 80% -h 80% -b rounded -S "fg=#bd93f9" \
+  "fzf --bind 'start:reload:true' \
+       --bind 'change:reload:rg --color=always --line-number --no-heading --smart-case --hidden --glob !.git --glob !node_modules --glob !.cache --glob !Library --glob !.local {q} || true' \
+       --phony --ansi --delimiter : \
+       --preview 'bat --color=always --style=numbers --highlight-line {2} {1}' \
+       --preview-window=right:50% \
+       --color='bg:#282a36,fg:#f8f8f2,hl:#bd93f9,bg+:#44475a,fg+:#f8f8f2,hl+:#ff79c6,info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6,marker:#ff79c6,spinner:#ffb86c,header:#6272a4' \
+   | awk -F: '{print \"+\" $2 \" \" $1}' | xargs tmux new-window nvim"
+
+# App launcher
+bind a display-popup -E -w 50% -h 50% -b rounded -S "fg=#bd93f9" \
+  "ls /Applications /Applications/Utilities /System/Applications 2>/dev/null | \
+   grep '\\.app$' | sed 's/\\.app$//' | sort -u | \
+   fzf --color='bg:#282a36,fg:#f8f8f2,hl:#bd93f9,bg+:#44475a,fg+:#f8f8f2,hl+:#ff79c6,info:#ffb86c,prompt:#50fa7b,pointer:#ff79c6,marker:#ff79c6,spinner:#ffb86c,header:#6272a4' \
+   | xargs -I{} open -a '{}'"
 
 # ── Reload ─────────────────────────────────────────────────────────
 bind r source-file ~/.config/tmux/tmux.conf \; display "Config reloaded"

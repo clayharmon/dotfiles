@@ -23,9 +23,39 @@ confirm-close-surface = false
 quit-after-last-window-closed = true
 scrollback-limit = 10000
 
-# Tmux keybinds (prefix is C-a = \x01)
+# Tmux keybinds (cmd as shared modifier — Ghostty takes precedence,
+# everything else forwards prefix (C-a = \x01) + key to tmux)
+
+# Splits
 keybind = cmd+enter=text:\x01v
-keybind = cmd+l=text:\x01\x20
+keybind = cmd+shift+enter=text:\x01s
+
+# Windows
+keybind = cmd+backslash=text:\x01c
+keybind = cmd+1=text:\x011
+keybind = cmd+2=text:\x012
+keybind = cmd+3=text:\x013
+keybind = cmd+4=text:\x014
+keybind = cmd+5=text:\x015
+keybind = cmd+6=text:\x016
+keybind = cmd+7=text:\x017
+keybind = cmd+8=text:\x018
+keybind = cmd+9=text:\x019
+
+# Pane navigation
+keybind = cmd+h=text:\x01h
+keybind = cmd+j=text:\x01j
+keybind = cmd+k=text:\x01k
+keybind = cmd+l=text:\x01l
+
+# Actions
+keybind = cmd+z=text:\x01z
+keybind = cmd+d=text:\x01x
+keybind = cmd+b=text:\x01[
+
+# Popups
+keybind = cmd+f=text:\x01f
+keybind = cmd+g=text:\x01g
 {{- if eq .chezmoi.os "darwin" }}
 
 # macOS

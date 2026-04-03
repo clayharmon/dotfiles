@@ -66,13 +66,13 @@
                         ]
                     },
                     {
-                        "description": "Open Ghostty by cmd + return",
+                        "description": "Open Ghostty by opt + return",
                         "manipulators": [
                             {
                                 "from": {
                                     "key_code": "return_or_enter",
                                     "modifiers": {
-                                        "mandatory": ["command"],
+                                        "mandatory": ["left_option"],
                                         "optional": ["caps_lock"]
                                     }
                                 },

@@ -45,8 +45,6 @@ return {
                 "json", "yaml", "toml", "html", "css", "bash", "fish",
             })
 
-            -- Neovim 0.12: highlighting is enabled via vim.treesitter.start()
-            -- Enable treesitter highlighting for all filetypes with installed parsers
             vim.api.nvim_create_autocmd('FileType', {
                 callback = function(args)
                     pcall(vim.treesitter.start, args.buf)
