@@ -20,6 +20,7 @@ return {
             vim.keymap.set('n', '<leader>pg', fzf.live_grep, {})
             vim.keymap.set('n', '<leader>pb', fzf.buffers, {})
             vim.keymap.set('n', '<leader>ph', fzf.helptags, {})
+            vim.keymap.set('n', '<leader>pe', fzf.diagnostics_workspace, {})
         end
     },
     {
@@ -87,20 +88,16 @@ return {
             })
         end
     },
+    -- Markdown rendered in the buffer. Replaces markdown-preview.nvim (needed
+    -- npm) and the glow popup (needed tmux). Toggle with <leader>mp.
     {
-        'iamcco/markdown-preview.nvim',
-        cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-        ft = { "markdown" },
-        build = "cd app && npm install",
-        config = function()
-            vim.g.mkdp_theme = 'dark'
-            vim.keymap.set('n', '<leader>mp', '<cmd>MarkdownPreviewToggle<cr>', { desc = "Markdown preview (browser)" })
-            -- Glow preview in tmux popup
-            vim.keymap.set('n', '<leader>mg', function()
-                local file = vim.fn.expand('%:p')
-                vim.cmd('silent !tmux display-popup -E -w 80\\% -h 80\\% -b rounded -S "fg=\\#bd93f9" "/opt/homebrew/bin/glow -p \'' .. file .. '\'"')
-            end, { desc = "Markdown preview (terminal)" })
-        end,
+        'MeanderingProgrammer/render-markdown.nvim',
+        ft = { 'markdown' },
+        dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
+        opts = {},
+        keys = {
+            { '<leader>mp', '<cmd>RenderMarkdown toggle<cr>', desc = 'Toggle markdown rendering' },
+        },
     },
     {
         'stevearc/oil.nvim',
@@ -135,66 +132,5 @@ return {
     },
     {
         'tpope/vim-sleuth',
-    },
-
-    -- Claude Code <-> Neovim integration (WebSocket protocol, same as VS Code extension)
-    {
-        "coder/claudecode.nvim",
-        opts = {
-            terminal = {
-                split_side = "right",
-                split_width_percentage = 0.4,
-            },
-        },
-        keys = {
-            { "<leader>ac", "<cmd>ClaudeCode<cr>", desc = "Toggle Claude Code" },
-            { "<leader>aB", "<cmd>ClaudeCode --dangerously-skip-permissions<cr>", desc = "Claude Code (bypass perms)" },
-            { "<leader>af", "<cmd>ClaudeCodeFocus<cr>", desc = "Focus Claude" },
-            { "<leader>ar", "<cmd>ClaudeCode --resume<cr>", desc = "Resume session" },
-            { "<leader>aC", "<cmd>ClaudeCode --continue<cr>", desc = "Continue last session" },
-            { "<leader>as", "<cmd>ClaudeCodeSend<cr>", mode = "v", desc = "Send selection to Claude" },
-            { "<leader>ab", "<cmd>ClaudeCodeAdd %<cr>", desc = "Add buffer to context" },
-        },
-    },
-
-    -- CodeCompanion (inline AI chat/edits)
-    {
-        "olimorris/codecompanion.nvim",
-        dependencies = {
-            "nvim-lua/plenary.nvim",
-            "nvim-treesitter/nvim-treesitter",
-        },
-       config = function()
-            local use_bedrock = os.getenv("CLAUDE_CODE_USE_BEDROCK")
-
-            local adapter_config = {}
-            if not use_bedrock then
-                adapter_config.env = {
-                    CLAUDE_CODE_OAUTH_TOKEN = os.getenv("CLAUDE_CODE_OAUTH_TOKEN")
-                }
-            end
-
-            require("codecompanion").setup({
-                version = "v17.33.0",
-                ignore_warnings = true,
-                adapters = {
-                    http = {
-                        claude_code = function()
-                            return require("codecompanion.adapters").extend("claude_code", adapter_config)
-                        end,
-                    }
-                },
-                strategies = {
-                    chat = {
-                        adapter = "claude_code",
-                    },
-                    inline = {
-                        adapter = "claude_code",
-                    },
-                },
-            })
-            vim.keymap.set("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>")
-            vim.keymap.set("v", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>")
-        end,
     },
 }

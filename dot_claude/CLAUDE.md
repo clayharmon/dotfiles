@@ -1,27 +1,24 @@
-# CLI Tools
+# Machine
 
-When running shell commands, prefer these modern tools over their legacy equivalents:
+macOS on Apple Silicon, Homebrew. fish with starship, zoxide, atuin. kitty runs
+herdr (agent multiplexer); there is no tmux. AeroSpace, sketchybar, JankyBorders,
+Karabiner, Hammerspoon. Neovim 0.12 with lazy.nvim and native `vim.lsp.config`.
+Runtimes come from mise. Dotfiles are in chezmoi, public at github.com/clayharmon/dotfiles.
 
-| Instead of | Use | Notes |
-|-----------|-----|-------|
-| `ls` | `eza` | supports `--icons`, `--git`, `--tree` |
-| `cat` | `bat` | syntax highlighting, `-p` for plain |
-| `find` | `fd` | respects .gitignore, sane defaults |
-| `grep` | `rg` (ripgrep) | fastest grep, respects .gitignore |
-| `cd` | `z` (zoxide) | frecency-based, learns directories |
-| `sed` | `sd` | simpler regex syntax |
-| `curl` (for APIs) | `xh` | colorized JSON output |
-| `du` | `dust` | visual disk usage |
-| `diff` | `delta` | syntax-highlighted diffs |
+# Shell commands
 
-# Editor
+Prefer eza, bat, fd, rg, sd, xh, dust, delta over ls, cat, find, grep, sed, curl, du, diff.
 
-Neovim 0.11 with lazy.nvim. Uses native `vim.lsp.config` + `vim.lsp.enable` (not the deprecated `require('lspconfig').setup` pattern). Plugins: fzf-lua, blink.cmp, harpoon2, oil.nvim.
+# Writing voice
 
-# Shell
+Applies to all prose written for me: docs, commit messages, PR descriptions, UI copy, email.
 
-Fish shell with starship prompt, zoxide, atuin (shell history). No oh-my-fish, no fisher plugins beyond fzf-fish.
-
-# macOS
-
-AeroSpace (tiling WM), JankyBorders, Ghostty terminal, Karabiner-Elements. Homebrew for packages.
+- One checkable fact per sentence: a number, a named tool, a concrete behavior. If a
+  sentence could sit unchanged in another project's docs, cut it.
+- Replace the adjective with the measurement. Banned: robust, seamless, powerful,
+  blazing, comprehensive, leverage, empower, utilize, facilitate.
+- No em-dashes in headers, at most one per page in body. No "not just X, it's Y".
+  At most one rhetorical triple per page.
+- State limits early and plainly. One status flag per document.
+- No throat-clearing, no summarizing closers. Commands, filenames, formats in backticks.
+- Test: would you say it to a friend across a table?

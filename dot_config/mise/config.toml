@@ -1,4 +1,6 @@
 [settings]
+# Tool paths stay at the front of PATH even after fish_add_path runs.
+activate_aggressive = true
 idiomatic_version_file_enable_tools = ["node", "python", "ruby"]
 
 [tools]

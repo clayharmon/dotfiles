@@ -1,0 +1,49 @@
+# ~/.config/herdr/config.toml
+# Only overrides live here. `herdr --default-config` prints the rest.
+# Check:  herdr config check
+# Apply:  herdr server reload-config
+onboarding = false
+
+[theme]
+name = "dracula"
+
+[ui]
+hide_tab_bar_when_single_tab = true
+prompt_new_tab_name = false
+
+[keys]
+# The cmd chords below arrive from kitty over the kitty keyboard protocol.
+# ~/.config/kitty/kitty.conf maps each one to no_op so kitty passes it through
+# instead of acting on it. Add a chord here, add a no_op there.
+split_vertical     = ["prefix+v", "cmd+enter"]           # split right
+split_horizontal   = ["prefix+minus", "cmd+shift+enter"] # split down
+zoom               = ["prefix+z", "cmd+z"]
+close_pane         = ["prefix+x", "cmd+d"]
+resize_mode        = ["prefix+r", "cmd+r"]
+new_workspace      = ["prefix+shift+n", "cmd+n"]
+new_tab            = ["prefix+c", "cmd+t"]
+previous_tab       = ["prefix+p", "cmd+h"]
+next_tab           = ["prefix+n", "cmd+l"]
+switch_tab         = "cmd+1..9"
+next_workspace     = "cmd+j"
+previous_workspace = "cmd+k"
+
+# lazygit in a popup over the current tab.
+[[keys.command]]
+key = ["prefix+g", "cmd+g"]
+type = "popup"
+command = "lazygit"
+width = "90%"
+height = "90%"
+
+# reviewr: code-review pane. <plugin_id>.<action_id>. Toggle shows or hides it.
+[[keys.command]]
+key = ["prefix+d", "cmd+shift+r"]
+type = "plugin_action"
+command = "persiyanov.reviewr.toggle"
+
+# file viewer: git-aware read-only tree + diff/markdown/code pane, in a split.
+[[keys.command]]
+key = ["prefix+f", "cmd+shift+e"]
+type = "plugin_action"
+command = "herdr-file-viewer.open-file-viewer"

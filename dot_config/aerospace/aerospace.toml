@@ -48,7 +48,7 @@ on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 # You can effectively turn off macOS "Hide application" (cmd-h) feature by toggling this flag
 # Useful if you don't use this macOS feature, but accidentally hit cmd-h or cmd-alt-h key
 # Also see: https://nikitabobko.github.io/AeroSpace/goodies#disable-hide-app
-automatically-unhide-macos-hidden-apps = false
+automatically-unhide-macos-hidden-apps = true
 
 # Assign workspaces to monitors
 # 1-5 on built-in display, 6-9 on external
@@ -83,7 +83,9 @@ automatically-unhide-macos-hidden-apps = false
     inner.vertical =   10
     outer.left =       8
     outer.bottom =     8
-    outer.top =        18
+    # The built-in display keeps the notch strip out of the tiling area, so 18 is a
+    # plain gap there. Every other monitor needs room for the 36 px sketchybar + 8.
+    outer.top =        [{ monitor."built-in" = 18 }, 44]
     outer.right =      8
 
 # 'main' binding mode declaration
@@ -122,6 +124,12 @@ automatically-unhide-macos-hidden-apps = false
     # See: https://nikitabobko.github.io/AeroSpace/commands#layout
     alt-slash = 'layout tiles horizontal vertical'
     alt-comma = 'layout accordion horizontal vertical'
+
+    # Terminal, fullscreen, float. Karabiner used to own opt+return for Ghostty.
+    # Workspace 1 first, so the new kitty window (pinned to 1 below) opens focused.
+    alt-enter = ['workspace 1', 'exec-and-forget /Applications/kitty.app/Contents/MacOS/kitty --single-instance -d ~']
+    alt-f = 'fullscreen'
+    alt-shift-f = 'layout floating tiling'
 
     # See: https://nikitabobko.github.io/AeroSpace/commands#focus
     alt-h = 'focus left'
@@ -190,3 +198,32 @@ automatically-unhide-macos-hidden-apps = false
     down = 'volume down'
     up = 'volume up'
     shift-down = ['volume set 0', 'mode main']
+
+# Where new windows go. Rules run once, when the window first appears.
+# 1 terminal, 2 browser, 3 chat. A rule for an app that is not installed
+# never fires, so the Slack rule is harmless on the personal machine.
+# Bundle ids: defaults read /Applications/X.app/Contents/Info.plist CFBundleIdentifier
+[[on-window-detected]]
+if.app-id = 'net.kovidgoyal.kitty'
+run = 'move-node-to-workspace 1'
+
+[[on-window-detected]]
+if.app-id = 'org.mozilla.firefoxdeveloperedition'
+run = 'move-node-to-workspace 2'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.MobileSMS'
+run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace 3'
+
+# Small utility windows float instead of taking half the screen.
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'

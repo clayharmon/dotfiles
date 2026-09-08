@@ -26,9 +26,10 @@ local capabilities = require("blink.cmp").get_lsp_capabilities()
 -- Apply blink capabilities to all servers
 vim.lsp.config("*", { capabilities = capabilities })
 
--- ruby_lsp needs custom cmd since it's not installed via Mason
+-- ruby_lsp comes from Mason (mason/bin is on PATH above). mise exec picks the
+-- Ruby that .ruby-version or mise.toml names for the project.
 vim.lsp.config("ruby_lsp", {
-    cmd = { "rbenv", "exec", "ruby-lsp" },
+    cmd = { "mise", "exec", "--", "ruby-lsp" },
 })
 vim.lsp.enable("ruby_lsp")
 

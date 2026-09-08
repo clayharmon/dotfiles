@@ -13,7 +13,11 @@ return {
             "neovim/nvim-lspconfig",
         },
         opts = {
-            ensure_installed = { "ts_ls", "lua_ls", "rust_analyzer" },
+            -- ruby_lsp is configured in clay/init.lua and runs through mise.
+            ensure_installed = {
+                "ts_ls", "lua_ls", "rust_analyzer",
+                "bashls", "fish_lsp", "jsonls", "yamlls", "taplo",
+            },
             -- Automatically calls vim.lsp.enable() for Mason-installed servers
             automatic_enable = true,
         },

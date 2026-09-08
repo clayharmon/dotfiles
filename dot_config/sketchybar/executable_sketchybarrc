@@ -1,25 +1,27 @@
 #!/bin/bash
+# sketchybar config. Reload with: sketchybar --reload
+# Scripts run under launchd, which does not put Homebrew on PATH.
+export PATH="/opt/homebrew/bin:$PATH"
 
-# Dracula color palette
+# Dracula
 BACKGROUND=0xff282a36
 CURRENT_LINE=0xff44475a
 FOREGROUND=0xfff8f8f2
 COMMENT=0xff6272a4
-CYAN=0xff8be9fd
 GREEN=0xff50fa7b
 PURPLE=0xffbd93f9
 RED=0xffff5555
-YELLOW=0xfff1fa8c
 
 PLUGIN_DIR="$CONFIG_DIR/plugins"
 FONT="JetBrainsMono Nerd Font"
 
-##### Bar Appearance #####
+##### Bar #####
+# height=36 is not reserved by sketchybar. AeroSpace reserves it through
+# gaps.outer.top in aerospace.toml (44 on monitors without a notch).
 sketchybar --bar \
   position=top \
   height=36 \
   color=$BACKGROUND \
-  border_color=$COMMENT \
   border_width=0 \
   shadow=off \
   margin=0 \
@@ -45,67 +47,51 @@ default=(
 )
 sketchybar --default "${default[@]}"
 
-##### Aerospace Workspaces #####
+##### AeroSpace workspaces #####
+# All nine items exist from startup. plugins/aerospace.sh decides what is drawn:
+# 6-9 and the separator show when a second monitor is connected or the
+# workspace has windows. display_change re-runs it when a monitor is plugged in.
 sketchybar --add event aerospace_workspace_change
 
-# Laptop workspaces (1-5)
-for sid in 1 2 3 4 5; do
-  sketchybar --add item space.$sid left \
-    --set space.$sid \
+add_space() {
+  sketchybar --add item "space.$1" left \
+    --set "space.$1" \
       background.color=$CURRENT_LINE \
       background.corner_radius=5 \
       background.height=24 \
       background.drawing=off \
       icon.drawing=off \
-      label="$sid" \
+      label="$1" \
       label.color=$COMMENT \
       label.font="$FONT:Bold:14.0" \
       label.padding_left=8 \
       label.padding_right=8 \
-      click_script="aerospace workspace $sid"
-done
+      click_script="aerospace workspace $1"
+}
 
-# External monitor workspaces (6-9) -- only show if secondary monitor connected
-MONITOR_COUNT=$(aerospace list-monitors 2>/dev/null | wc -l | tr -d ' ')
+for sid in 1 2 3 4 5; do add_space "$sid"; done
 
-if [ "$MONITOR_COUNT" -gt 1 ]; then
-  sketchybar --add item separator left \
-    --set separator \
-      icon="│" \
-      icon.color=$COMMENT \
-      icon.font="$FONT:Bold:16.0" \
-      icon.padding_left=4 \
-      icon.padding_right=4 \
-      label.drawing=off \
-      background.drawing=off
+sketchybar --add item separator left \
+  --set separator \
+    icon="│" \
+    icon.color=$COMMENT \
+    icon.font="$FONT:Bold:16.0" \
+    icon.padding_left=4 \
+    icon.padding_right=4 \
+    label.drawing=off \
+    background.drawing=off \
+    drawing=off
 
-  for sid in 6 7 8 9; do
-    sketchybar --add item space.$sid left \
-      --set space.$sid \
-        background.color=$CURRENT_LINE \
-        background.corner_radius=5 \
-        background.height=24 \
-        background.drawing=off \
-        icon.drawing=off \
-        label="$sid" \
-        label.color=$COMMENT \
-        label.font="$FONT:Bold:14.0" \
-        label.padding_left=8 \
-        label.padding_right=8 \
-        click_script="aerospace workspace $sid"
-  done
-fi
+for sid in 6 7 8 9; do add_space "$sid"; done
 
-# Single trigger handles ALL workspace updates in one batch
 sketchybar --add item space_trigger left \
-  --subscribe space_trigger aerospace_workspace_change front_app_switched \
+  --subscribe space_trigger aerospace_workspace_change front_app_switched display_change \
   --set space_trigger \
     drawing=off \
     script="$PLUGIN_DIR/aerospace.sh"
 
-##### Right Side Items #####
+##### Right side #####
 
-# Clock
 sketchybar --add item clock right \
   --set clock \
     icon="" \
@@ -114,7 +100,6 @@ sketchybar --add item clock right \
     update_freq=10 \
     script="$PLUGIN_DIR/clock.sh"
 
-# Battery
 sketchybar --add item battery right \
   --set battery \
     icon.color=$GREEN \
@@ -123,8 +108,17 @@ sketchybar --add item battery right \
     script="$PLUGIN_DIR/battery.sh" \
   --subscribe battery system_woke power_source_change
 
+# Herdr agents: "waiting/total". Red when one needs an approval or an answer.
+sketchybar --add item herdr right \
+  --set herdr \
+    icon="󰚩" \
+    icon.color=$COMMENT \
+    label.color=$COMMENT \
+    update_freq=5 \
+    script="$PLUGIN_DIR/herdr.sh" \
+  --subscribe herdr system_woke
 
-# Search (triggers hammerspoon launcher)
+# Hammerspoon launcher
 sketchybar --add item search right \
   --set search \
     icon="/" \
@@ -133,5 +127,5 @@ sketchybar --add item search right \
     label.drawing=off \
     click_script="open -g hammerspoon://launcher"
 
-##### Force all scripts to run the first time #####
+##### Run every script once #####
 sketchybar --update
