@@ -1,5 +1,15 @@
 #!/usr/bin/env ruby
-# Step 3: Set fish as default shell
+# Step 3: fish as login shell, fish plugins, herdr plugins and completions.
+# Idempotent: every step checks before it acts.
+
+def run(cmd)
+  puts "=> #{cmd}"
+  system(cmd) || abort("Failed: #{cmd}")
+end
+
+def installed?(bin)
+  system("command -v #{bin} >/dev/null 2>&1")
+end
 
 fish_path = `which fish 2>/dev/null`.strip
 
@@ -8,6 +18,7 @@ if fish_path.empty?
   exit 0
 end
 
+# ── Login shell ─────────────────────────────────────────────────────
 begin
   shells = File.read("/etc/shells")
 rescue
@@ -22,6 +33,31 @@ end
 unless ENV["SHELL"] == fish_path
   puts "Setting fish as default shell..."
   system("chsh -s '#{fish_path}'")
+end
+
+# ── fisher + plugins listed in ~/.config/fish/fish_plugins ─────────
+# config.fish calls fzf_configure_bindings, which fzf.fish provides.
+unless system("fish -c 'functions -q fisher' >/dev/null 2>&1")
+  puts "Installing fisher..."
+  run "fish -c 'curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher update'"
+end
+
+# ── herdr: fish completions and the two plugins config.toml binds ───
+if installed?("herdr")
+  completions = File.expand_path("~/.config/fish/completions")
+  Dir.mkdir(completions) unless Dir.exist?(completions)
+  run "herdr completion fish > #{completions}/herdr.fish"
+
+  plugins = `herdr plugin list --json 2>/dev/null`
+  {
+    "herdr-file-viewer" => "smarzban/herdr-file-viewer",
+    "persiyanov.reviewr" => "persiyanov/herdr-reviewr",
+  }.each do |id, repo|
+    next if plugins.include?(%("plugin_id":"#{id}")) || plugins.include?(%("plugin_id": "#{id}"))
+    run "herdr plugin install -y #{repo}"
+  end
+else
+  puts "herdr not found, skipping completions and plugins"
 end
 
 puts "Shell setup complete!"

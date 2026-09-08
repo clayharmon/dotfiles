@@ -23,7 +23,11 @@ enable_audio_bell no
 
 # Window. herdr owns tabs and splits, so kitty's tab bar stays hidden.
 window_padding_width 4
+{{ if eq .chezmoi.os "darwin" -}}
 hide_window_decorations titlebar-only
+{{- else -}}
+hide_window_decorations yes
+{{- end }}
 tab_bar_style hidden
 confirm_os_window_close 0
 background_opacity 0.8

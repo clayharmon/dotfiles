@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# Step 4: macOS system preferences
+# Step 4: macOS system preferences and background services
 
 {{ if ne .chezmoi.os "darwin" -}}
 exit 0
@@ -47,7 +47,8 @@ defaults "com.apple.finder", "ShowStatusBar", "bool", "true"
 defaults "com.apple.desktopservices", "DSDontWriteNetworkStores", "bool", "true"
 defaults "com.apple.desktopservices", "DSDontWriteUSBStores", "bool", "true"
 
-# Hide menu bar
+# Hide the menu bar. sketchybar draws in its place; AeroSpace reserves the
+# room with gaps.outer.top in aerospace.toml.
 defaults "NSGlobalDomain", "_HIHideMenuBar", "bool", "true"
 
 # Disable ad tracking
@@ -57,11 +58,14 @@ defaults "com.apple.AdLib", "allowApplePersonalizedAdvertising", "bool", "false"
 defaults "com.apple.screencapture", "type", "string", "png"
 defaults "com.apple.screencapture", "disable-shadow", "bool", "true"
 
-# Start services
+# Background services: bar, window borders, and the herdr server so agent
+# sessions outlive the terminal window.
 system "brew services start felixkratz/formulae/sketchybar 2>/dev/null"
 system "brew services start felixkratz/formulae/borders 2>/dev/null"
+system "brew services start herdr 2>/dev/null"
 
 # Restart affected apps
 system "killall Dock Finder 2>/dev/null"
 
 puts "macOS defaults applied!"
+puts "borders and AeroSpace need Accessibility: System Settings > Privacy & Security > Accessibility."

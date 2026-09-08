@@ -21,10 +21,14 @@ fish_add_path -g \
     $HOME/.local/bin
 
 set -gx EDITOR nvim
-set -gx ANDROID_HOME $HOME/Library/Android/sdk
-set -gx JAVA_HOME /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
-set -gx --path PKG_CONFIG_PATH /opt/homebrew/opt/ncurses/lib/pkgconfig
 set -gx VIRTUAL_ENV_DISABLE_PROMPT true
+
+# macOS-only exports. fish_add_path above already skips directories that do not exist.
+if test (uname) = Darwin
+    set -gx ANDROID_HOME $HOME/Library/Android/sdk
+    set -gx JAVA_HOME /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
+    set -gx --path PKG_CONFIG_PATH /opt/homebrew/opt/ncurses/lib/pkgconfig
+end
 
 # API keys are not exported at startup. Run `secrets` in a shell that needs them.
 # They live age-encrypted in ~/.config/fish/secrets.env.age (see functions/secrets.fish).
@@ -34,15 +38,15 @@ if status is-interactive
     fish_vi_key_bindings
 
     # Runtimes: node, python, ruby from ~/.config/mise/config.toml
-    mise activate fish | source
+    command -q mise; and mise activate fish | source
 
-    # Prompt, cd, history.
+    # Prompt, cd, history. Each guarded so a half-bootstrapped machine still gets a prompt.
     # fzf.fish (conf.d) bound ctrl+r at startup. Re-run its installer without
     # the history binding BEFORE atuin, because it erases whatever it bound.
-    fzf_configure_bindings --history=
-    starship init fish | source
-    zoxide init fish --cmd cd | source
-    atuin init fish --disable-up-arrow | source
+    functions -q fzf_configure_bindings; and fzf_configure_bindings --history=
+    command -q starship; and starship init fish | source
+    command -q zoxide; and zoxide init fish --cmd cd | source
+    command -q atuin; and atuin init fish --disable-up-arrow | source
 
     # Lines that carry a secret never reach history or atuin sync.
     function fish_should_add_to_history

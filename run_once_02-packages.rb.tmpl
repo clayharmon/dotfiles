@@ -1,9 +1,14 @@
 #!/usr/bin/env ruby
-# Step 2: Install all CLI tools and applications
+# Step 2: Install CLI tools and applications.
+# Every helper is idempotent, so re-running after a change is safe.
 
 def run(cmd)
   puts "=> #{cmd}"
   system(cmd) || abort("Failed: #{cmd}")
+end
+
+def installed?(bin)
+  system("command -v #{bin} >/dev/null 2>&1")
 end
 
 def brew(*pkgs)
@@ -12,8 +17,15 @@ end
 
 def cask(*pkgs)
   pkgs.each do |pkg|
-    system("brew list --cask #{pkg} &>/dev/null") || run("brew install --cask #{pkg}")
+    system("brew list --cask #{pkg} >/dev/null 2>&1") || run("brew install --cask #{pkg}")
   end
+end
+
+# Third-party taps need `brew trust` on Homebrew 4.7+. Older brews lack the
+# subcommand, so a failure there is ignored.
+def tap(name)
+  run "brew tap #{name}"
+  system("brew trust #{name} >/dev/null 2>&1")
 end
 
 def pacman(*pkgs)
@@ -24,15 +36,28 @@ def dnf(*pkgs)
   run "sudo dnf install -y #{pkgs.join(" ")}"
 end
 
+# Herdr: agent multiplexer. Homebrew core on macOS, install script elsewhere.
+def herdr_install_script
+  return if installed?("herdr")
+  run "curl -fsSL https://herdr.dev/install.sh | sh"
+end
+
+# Claude Code: native installer, replaces the deprecated npm package.
+def claude_code
+  return if installed?("claude")
+  run "curl -fsSL https://claude.ai/install.sh | bash"
+end
+
 {{ if eq .chezmoi.os "darwin" -}}
 cli_tools = %w[
-  neovim fish tmux starship eza bat fd ripgrep
+  neovim fish starship eza bat fd ripgrep
   zoxide atuin git-delta sd xh dust fzf jq
   lazygit gh aichat glow tree-sitter tree-sitter-cli
+  herdr age
 ]
 
 apps = %w[
-  ghostty firefox@developer-edition aerospace
+  kitty firefox@developer-edition
   karabiner-elements hammerspoon docker bitwarden spotify
   font-jetbrains-mono-nerd-font
 ]
@@ -43,12 +68,13 @@ brew(*cli_tools)
 puts "Installing apps..."
 cask(*apps)
 
-puts "Installing macOS bar + borders..."
-run "brew tap FelixKratz/formulae"
-brew("sketchybar", "borders")
+puts "Installing AeroSpace (tiling WM), sketchybar, borders..."
+tap "nikitabobko/tap"
+cask "aerospace"
+tap "FelixKratz/formulae"
+brew "sketchybar", "borders"
 
-puts "Installing Claude Code CLI..."
-run "npm install -g @anthropic-ai/claude-code"
+claude_code
 
 {{ else if eq .chezmoi.os "linux" -}}
 def yay(*pkgs)
@@ -59,70 +85,62 @@ def cargo_install(*pkgs)
   pkgs.each { |pkg| run "cargo install #{pkg}" }
 end
 
-if system("command -v pacman &>/dev/null")
+if installed?("pacman")
   packages = %w[
-    neovim fish tmux starship eza bat fd ripgrep
+    base-devel git
+    neovim fish starship eza bat fd ripgrep
     zoxide atuin git-delta sd xh dust fzf jq
-    lazygit docker chromium github-cli ghostty aichat
-    ttf-jetbrains-mono-nerd
+    lazygit docker chromium github-cli aichat
+    kitty age ttf-jetbrains-mono-nerd
   ]
   puts "Installing packages (Arch)..."
   pacman(*packages)
 
-  # Install yay if not present
-  unless system("command -v yay &>/dev/null")
+  unless installed?("yay")
     puts "Installing yay..."
-    run "sudo pacman -S --needed --noconfirm git base-devel"
     run "git clone https://aur.archlinux.org/yay.git /tmp/yay && cd /tmp/yay && makepkg -si --noconfirm && rm -rf /tmp/yay"
   end
 
-  # AUR packages
   puts "Installing AUR packages..."
   yay("spotify", "firefox-developer-edition")
 
-elsif system("command -v dnf &>/dev/null")
-  # Packages available in default Fedora repos
+elsif installed?("dnf")
+  # Packages available in default Fedora repos. gcc/make: treesitter parsers.
   repo_packages = %w[
-    neovim fish tmux bat fd-find ripgrep
+    gcc make git
+    neovim fish bat fd-find ripgrep
     zoxide atuin git-delta du-dust fzf jq
-    gh chromium jetbrains-mono-fonts-all
+    gh chromium kitty age jetbrains-mono-fonts-all
   ]
   puts "Installing repo packages (Fedora)..."
   dnf(*repo_packages)
 
-  # Copr repos for packages not in default repos
   puts "Enabling Copr repos..."
   run "sudo dnf copr enable -y atim/starship"
   run "sudo dnf copr enable -y dejan/lazygit"
-  run "sudo dnf copr enable -y pgdev/ghostty"
 
   puts "Installing Copr packages..."
-  dnf("starship", "lazygit", "ghostty")
+  dnf("starship", "lazygit")
 
-  # Docker CE
   puts "Installing Docker CE..."
   run "sudo dnf config-manager addrepo --from-repofile=https://download.docker.com/linux/fedora/docker-ce.repo"
   dnf("docker-ce", "docker-ce-cli", "containerd.io", "docker-buildx-plugin", "docker-compose-plugin")
 
-  # Spotify via negativo17 repo
   puts "Installing Spotify..."
   run "sudo dnf config-manager --add-repo=https://negativo17.org/repos/fedora-spotify.repo"
   dnf("spotify-client")
 
-  # Firefox Developer Edition via Copr
   puts "Installing Firefox Developer Edition..."
   run "sudo dnf copr enable -y the4runner/firefox-dev"
   dnf("firefox-developer-edition")
 
-  # Tools not packaged for Fedora -- install via cargo
-  # eza: removed from F42 repos; sd: removed from F42+ repos
+  # Not packaged for Fedora. eza and sd left the repos in F42.
   puts "Installing cargo packages (eza, sd, xh, aichat)..."
   cargo_install("eza", "sd", "xh", "aichat")
 end
 
-# Claude Code CLI (npm -- available after mise installs node in step 01)
-puts "Installing Claude Code CLI..."
-run "npm install -g @anthropic-ai/claude-code"
+herdr_install_script
+claude_code
 
 {{ end -}}
 puts "Packages installed!"
