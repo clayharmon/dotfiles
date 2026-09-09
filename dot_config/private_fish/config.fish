@@ -18,6 +18,7 @@ fish_add_path -g \
     /opt/homebrew/opt/gawk/libexec/gnubin \
     /opt/gcc-14.2.0-3-aarch64/bin \
     /opt/homebrew/bin \
+    $HOME/.docker/bin \
     $HOME/.local/bin
 
 set -gx EDITOR nvim
