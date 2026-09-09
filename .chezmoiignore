@@ -9,3 +9,8 @@ README.md
 .config/karabiner/
 .hammerspoon/
 {{- end }}
+
+{{- if not .work }}
+# Companion to the PR Monitor app, work machines only.
+.config/sketchybar/plugins/pr_monitor.sh
+{{- end }}

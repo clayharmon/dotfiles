@@ -117,7 +117,18 @@ sketchybar --add item herdr right \
     update_freq=5 \
     script="$PLUGIN_DIR/herdr.sh" \
   --subscribe herdr system_woke
-
+{{ if .work }}
+# PR Monitor (pending review requests; click opens the popover)
+sketchybar --add item pr_monitor right \
+  --set pr_monitor \
+    icon="" \
+    icon.color=$COMMENT \
+    label.drawing=off \
+    update_freq=120 \
+    script="$PLUGIN_DIR/pr_monitor.sh" \
+    click_script="open -g prmonitor://toggle" \
+  --subscribe pr_monitor system_woke
+{{ end }}
 # Hammerspoon launcher
 sketchybar --add item search right \
   --set search \

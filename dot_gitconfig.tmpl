@@ -2,8 +2,13 @@
 	directory = /home/coreboot/cb_build
 [user]
 	name = Clay Harmon
+{{- if .work }}
+	email = clay.harmon@appfolio.com
+	signingkey = {{ .chezmoi.homeDir }}/.ssh/id_rsa
+{{- else }}
 	email = clay@clayharmon.me
 	signingkey = {{ .chezmoi.homeDir }}/.ssh/id_ed25519.pub
+{{- end }}
 [beads]
 	role = maintainer
 [init]

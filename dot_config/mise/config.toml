@@ -3,6 +3,9 @@
 activate_aggressive = true
 idiomatic_version_file_enable_tools = ["node", "python", "ruby"]
 
+[settings.ruby]
+compile = false
+
 [tools]
 node = "lts"
 python = "3.12"

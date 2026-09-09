@@ -66,3 +66,18 @@ API keys are not in this repo and never in `fish_variables`. `secrets edit` stor
 them age-encrypted in `~/.config/fish/secrets.env.age`; `secrets` exports them
 into the current shell. The age key lives in `~/.config/sops/age/shell.txt` and is
 copied to a new machine by hand.
+
+## work machines
+
+`chezmoi init` asks once whether this is a work machine and writes `work = true`
+into `~/.config/chezmoi/chezmoi.toml`. That flag switches: work git identity, the
+PR Monitor sketchybar item, no Firefox/Docker/Bitwarden/Spotify, no herdr plugins.
+
+This repo is public, so nothing employer-specific is in it. On a work machine
+`CLAUDE.md` imports `~/.claude/CLAUDE.work.md`, a local file that is never
+committed; copy it to a new work machine by hand.
+
+## not in this repo
+
+`~/.claude/settings.json`. Claude Code rewrites it (plugins, accepted prompts,
+effort) and it differs per machine, so it is set up by hand once per machine.

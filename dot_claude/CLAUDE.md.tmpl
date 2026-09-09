@@ -1,0 +1,52 @@
+# Machine
+
+{{ if .work -}}
+Work MacBook.
+{{ end -}}
+macOS on Apple Silicon, Homebrew. fish with starship, zoxide, atuin. kitty runs
+herdr (agent multiplexer); there is no tmux. AeroSpace, sketchybar, JankyBorders,
+Karabiner, Hammerspoon. Neovim 0.12 with lazy.nvim and native `vim.lsp.config`.
+Runtimes come from mise. Dotfiles are in chezmoi, public at github.com/clayharmon/dotfiles.
+
+# Shell commands
+
+Prefer eza, bat, fd, rg, sd, xh, dust, delta over ls, cat, find, grep, sed, curl, du, diff.
+For file work in Claude Code the built-in tools win: Read, Grep, Glob, Edit.
+
+- `rg -r` only rewrites printed output, never files. `rg` and `fd` skip gitignored files; `-u` includes them.
+- `fd` takes the pattern first, then the path: `fd 'pat' src/`. Regex by default, `-g` for globs.
+- `xh` uses httpie syntax, not curl flags. `-d` means download, not data.
+- `sd` edits files in place by default and captures are `$1`, not `\1`. Prefer Edit for bulk replaces.
+- `z`/zoxide is interactive only. Use absolute paths in commands.
+- Unsure of a flag? Read `--help` instead of guessing from the legacy tool.
+
+# Git
+
+Never resolve conflicts with a merge commit. Rebase onto the target branch and `git push --force-with-lease`.
+
+# Writing voice
+
+Applies to all prose written for me: docs, commit messages, PR descriptions, UI copy, email.
+
+- One checkable fact per sentence: a number, a named tool, a concrete behavior. If a
+  sentence could sit unchanged in another project's docs, cut it.
+- Replace the adjective with the measurement. Banned: robust, seamless, powerful,
+  blazing, comprehensive, leverage, empower, utilize, facilitate.
+- No em-dashes in headers, at most one per page in body. No "not just X, it's Y".
+  At most one rhetorical triple per page.
+- State limits early and plainly. One status flag per document.
+- No throat-clearing, no summarizing closers. Commands, filenames, formats in backticks.
+- Test: would you say it to a friend across a table?
+- Commit messages, PR descriptions, and Jira tickets: short and to the point.
+- No code comments unless asked. The one exception is a constraint or gotcha the code
+  itself can't express. Never comments that narrate the code, restate the obvious, or
+  explain a change to a reviewer.
+{{- if .work }}
+- Writing a PR description? Use the `pr-description` skill. It owns the template.
+{{- end }}
+
+Conversation style (concise, ADHD-friendly, plain English) lives in the "Concise ADHD"
+output style at `~/.claude/output-styles/concise-adhd.md`.
+{{ if .work }}
+@~/.claude/CLAUDE.work.md
+{{ end -}}

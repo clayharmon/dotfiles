@@ -56,12 +56,12 @@ cli_tools = %w[
   herdr age
 ]
 
-apps = %w[
-  kitty firefox@developer-edition
-  karabiner-elements hammerspoon docker bitwarden spotify
-  font-jetbrains-mono-nerd-font
-]
-
+apps = %w[kitty karabiner-elements hammerspoon font-jetbrains-mono-nerd-font]
+{{ if .work -}}
+apps += %w[pr-monitor]
+{{ else -}}
+apps += %w[firefox@developer-edition docker bitwarden spotify]
+{{ end }}
 puts "Installing CLI tools..."
 brew(*cli_tools)
 

@@ -47,7 +47,7 @@ if installed?("herdr")
   completions = File.expand_path("~/.config/fish/completions")
   Dir.mkdir(completions) unless Dir.exist?(completions)
   run "herdr completion fish > #{completions}/herdr.fish"
-
+{{ if not .work }}
   plugins = `herdr plugin list --json 2>/dev/null`
   {
     "herdr-file-viewer" => "smarzban/herdr-file-viewer",
@@ -56,6 +56,7 @@ if installed?("herdr")
     next if plugins.include?(%("plugin_id":"#{id}")) || plugins.include?(%("plugin_id": "#{id}"))
     run "herdr plugin install -y #{repo}"
   end
+{{ end -}}
 else
   puts "herdr not found, skipping completions and plugins"
 end
