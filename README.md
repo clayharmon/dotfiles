@@ -36,7 +36,7 @@ Scripts 02 to 05 need `sudo` at some point, so run it in a terminal you are watc
 2. `02-packages`: CLI tools, kitty, herdr, Claude Code, apps. macOS also gets AeroSpace, sketchybar, borders
 3. `03-shell-setup`: fish as login shell, fisher plugins, herdr completions and plugins
 4. `04-macos-defaults`: Dock, Finder, keyboard, hidden menu bar, starts the sketchybar, borders and herdr services
-5. `05-firefox`: Firefox Developer Edition policies and `user.js`
+5. `05-firefox`: Firefox Developer Edition policies and `user.js`. On a new machine it fails until Firefox has made a profile: open Firefox Developer Edition once, quit it, run `chezmoi apply`
 
 Scripts are `run_once_`: chezmoi runs each one the first time it sees that exact
 content. Editing a script makes it run again on the next `chezmoi apply`. On a

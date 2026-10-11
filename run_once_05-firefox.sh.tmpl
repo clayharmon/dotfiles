@@ -42,31 +42,42 @@ sudo tee "$POLICY_DIR/policies.json" > /dev/null << 'POLICY'
 POLICY
 
 # ── user.js ───────────────────────────────────────────────────────
-# Find the dev-edition-default profile directory
 {{ if eq .chezmoi.os "darwin" -}}
 FF_DIR="$HOME/Library/Application Support/Firefox"
+[ -d "/Applications/Firefox Developer Edition.app" ] && FF_INSTALLED=1
 {{ else if eq .chezmoi.os "linux" -}}
 FF_DIR="$HOME/.mozilla/firefox"
+(command -v firefox-developer-edition || command -v firefox-dev) >/dev/null && FF_INSTALLED=1
 {{ end -}}
 
-PROFILE_DIR=""
-if [ -f "$FF_DIR/profiles.ini" ]; then
-  # Find the dev-edition-default profile path
-  PROFILE_REL=$(grep -A2 'Name=dev-edition-default' "$FF_DIR/profiles.ini" | grep 'Path=' | cut -d= -f2)
-  if [ -n "$PROFILE_REL" ]; then
-    PROFILE_DIR="$FF_DIR/$PROFILE_REL"
+# installs.ini names the profile each install actually launches. The profile
+# *named* dev-edition-default in profiles.ini can be a stale one left behind
+# by a profile reset or the profile manager.
+PROFILE_REL=$(grep -h '^Default=.*dev-edition-default' "$FF_DIR/installs.ini" 2>/dev/null | head -1 | cut -d= -f2-)
+if [ -z "$PROFILE_REL" ]; then
+  PROFILE_REL=$(grep -A2 'Name=dev-edition-default' "$FF_DIR/profiles.ini" 2>/dev/null | grep 'Path=' | head -1 | cut -d= -f2-)
+fi
+case "$PROFILE_REL" in
+  /*) PROFILE_DIR="$PROFILE_REL" ;;
+  ?*) PROFILE_DIR="$FF_DIR/$PROFILE_REL" ;;
+  *)  PROFILE_DIR="" ;;
+esac
+
+# Fall back to any dev-edition profile. macOS keeps them under Profiles/.
+if [ ! -d "$PROFILE_DIR" ]; then
+  PROFILE_DIR=$(find "$FF_DIR" "$FF_DIR/Profiles" -maxdepth 1 -name "*.dev-edition-default*" -type d 2>/dev/null | head -1)
+fi
+
+if [ ! -d "$PROFILE_DIR" ]; then
+  if [ -z "$FF_INSTALLED" ]; then
+    echo "Firefox Developer Edition is not installed, skipping user.js"
+    exit 0
   fi
-fi
-
-# Fall back to any profile ending in .dev-edition-default
-if [ -z "$PROFILE_DIR" ] || [ ! -d "$PROFILE_DIR" ]; then
-  PROFILE_DIR=$(find "$FF_DIR" -maxdepth 1 -name "*.dev-edition-default" -type d 2>/dev/null | head -1)
-fi
-
-if [ -z "$PROFILE_DIR" ] || [ ! -d "$PROFILE_DIR" ]; then
-  echo "Warning: Firefox Developer Edition profile not found, skipping user.js"
-  echo "Run Firefox once to create a profile, then re-run: chezmoi apply"
-  exit 0
+  # Exit non-zero so chezmoi does not mark this run_once script as done and
+  # runs it again on the next `chezmoi apply`.
+  echo "Firefox Developer Edition has no profile yet." >&2
+  echo "Open it once, quit it, then run: chezmoi apply" >&2
+  exit 1
 fi
 
 echo "Installing user.js to $PROFILE_DIR..."
@@ -107,4 +118,4 @@ user_pref("browser.tabs.groups.smart.userEnabled", false);
 user_pref("sidebar.visibility", "hide-sidebar");
 USERJS
 
-echo "Firefox setup complete!"
+echo "Firefox setup complete! Restart Firefox Developer Edition to load user.js and the policies."
