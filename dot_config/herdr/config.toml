@@ -41,6 +41,15 @@ command = "lazygit"
 width = "90%"
 height = "90%"
 
+# bdi (beady-eye): the beads tree for the focused pane's project, with each
+# claimed bead's live herdr pane. Reads the project under the pane's cwd; no config.
+[[keys.command]]
+key = ["prefix+i", "cmd+i"]
+type = "popup"
+command = "bdi"
+width = "90%"
+height = "90%"
+
 # reviewr: code-review pane. <plugin_id>.<action_id>. Toggle shows or hides it.
 [[keys.command]]
 key = ["prefix+d", "cmd+shift+r"]

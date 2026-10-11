@@ -18,6 +18,15 @@ defaults "com.apple.dock", "autohide-time-modifier", "float", "0.2"
 defaults "com.apple.dock", "show-recents", "bool", "false"
 defaults "com.apple.dock", "mru-spaces", "bool", "false"
 defaults "com.apple.dock", "tilesize", "int", "48"
+# Empty Apple's default apps out of the Dock. This runs again whenever this
+# script changes, so anything pinned by hand is cleared then too.
+system "defaults write com.apple.dock persistent-apps -array"
+
+# Desktop: no widgets, and clicking the wallpaper (an empty AeroSpace gap)
+# no longer sweeps every window off screen.
+defaults "com.apple.WindowManager", "StandardHideWidgets", "bool", "true"
+defaults "com.apple.WindowManager", "StageManagerHideWidgets", "bool", "true"
+defaults "com.apple.WindowManager", "EnableStandardClickToShowDesktop", "bool", "false"
 
 # Keyboard
 defaults "NSGlobalDomain", "InitialKeyRepeat", "int", "15"

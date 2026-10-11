@@ -14,3 +14,6 @@ README.md
 # Companion to the PR Monitor app, work machines only.
 .config/sketchybar/plugins/pr_monitor.sh
 {{- end }}
+
+# Per-machine git identities and url rewrites, included from ~/.gitconfig.
+.config/git/

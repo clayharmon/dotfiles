@@ -53,7 +53,7 @@ cli_tools = %w[
   neovim fish starship eza bat fd ripgrep
   zoxide atuin git-delta sd xh dust fzf jq
   lazygit gh aichat glow tree-sitter tree-sitter-cli
-  herdr age
+  herdr age pngpaste
 ]
 
 apps = %w[kitty karabiner-elements hammerspoon font-jetbrains-mono-nerd-font]
@@ -73,6 +73,10 @@ tap "nikitabobko/tap"
 cask "aerospace"
 tap "FelixKratz/formulae"
 brew "sketchybar", "borders"
+
+puts "Installing bdi (beads tree, the herdr cmd+i popup)..."
+tap "codeforbreakfast/tap"
+brew "bdi"
 
 claude_code
 

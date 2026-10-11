@@ -19,3 +19,5 @@
 	gpgsign = true
 [gpg "ssh"]
 	allowedSignersFile = {{ .chezmoi.homeDir }}/.ssh/allowed_signers
+[include]
+	path = {{ .chezmoi.homeDir }}/.config/git/local
