@@ -1,0 +1,60 @@
+{
+  "id": "root",
+  "type": "column",
+  "titlebar": "none",
+  "traffic_lights": [14, 12],
+  "preview": "layouts/clay.svg",
+  "theme": "dracula",
+  "font_size": 16,
+  "background": "background",
+  "terminal_padding": [10, 8],
+  "children": [
+    {
+      "id": "bar",
+      "type": "block",
+      "size": { "px": 38 },
+      "window_drag": true,
+      "content": { "mod": "clay-bar" }
+    },
+    {
+      "id": "work-body",
+      "type": "row",
+      "divider": { "width": 1, "color": "border" },
+      "children": [
+        {
+          "id": "main",
+          "type": "block",
+          "content": {
+            "tab": "active",
+            "pane": {
+              "gap": 6,
+              "radius": 6,
+              "border": { "width": 1, "color": "border" },
+              "focus": { "width": 1, "color": "accent" },
+              "lone": false
+            }
+          }
+        },
+        {
+          "id": "panel",
+          "type": "column",
+          "hidden": true,
+          "size": { "px": 400 },
+          "min": 280,
+          "max": 900,
+          "children": [
+            {
+              "id": "panel-body",
+              "type": "stack",
+              "active": "files",
+              "children": [
+                { "id": "files", "type": "block", "content": { "mod": "files" } },
+                { "id": "changes", "type": "block", "content": { "mod": "changes" } }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200">
+  <rect width="320" height="200" fill="#282a36"/>
+  <!-- the one bar -->
+  <rect width="320" height="18" fill="#21222c"/>
+  <rect y="18" width="320" height="1" fill="#44475a"/>
+  <circle cx="9" cy="9" r="2.5" fill="#ff5555"/>
+  <circle cx="17" cy="9" r="2.5" fill="#f1fa8c"/>
+  <circle cx="25" cy="9" r="2.5" fill="#50fa7b"/>
+  <!-- space pills: the shown one, a working one, a blocked one, an idle one -->
+  <rect x="36" y="4" width="52" height="11" rx="3" fill="#343746" stroke="#44475a"/>
+  <rect x="41" y="8" width="30" height="3" rx="1.5" fill="#f8f8f2"/>
+  <rect x="92" y="4" width="52" height="11" rx="3" fill="#21222c"/>
+  <rect x="97" y="8" width="30" height="3" rx="1.5" fill="#6272a4"/>
+  <circle cx="136" cy="9.5" r="2.5" fill="none" stroke="#f1fa8c" stroke-width="1.2"/>
+  <rect x="148" y="4" width="52" height="11" rx="3" fill="#21222c" stroke="#ff5555"/>
+  <rect x="153" y="8" width="30" height="3" rx="1.5" fill="#6272a4"/>
+  <circle cx="192" cy="9.5" r="2" fill="#ff5555"/>
+  <rect x="204" y="4" width="44" height="11" rx="3" fill="#21222c"/>
+  <rect x="209" y="8" width="30" height="3" rx="1.5" fill="#6272a4"/>
+  <!-- panel toggles -->
+  <rect x="270" y="8" width="18" height="3" rx="1.5" fill="#6272a4"/>
+  <rect x="294" y="8" width="20" height="3" rx="1.5" fill="#6272a4"/>
+  <!-- one bare terminal -->
+  <rect x="10" y="30" width="120" height="3" rx="1.5" fill="#bd93f9"/>
+  <rect x="10" y="40" width="200" height="3" rx="1.5" fill="#f8f8f2" opacity="0.8"/>
+  <rect x="10" y="50" width="170" height="3" rx="1.5" fill="#f8f8f2" opacity="0.8"/>
+  <rect x="10" y="60" width="90" height="3" rx="1.5" fill="#50fa7b"/>
+  <rect x="10" y="76" width="230" height="3" rx="1.5" fill="#f8f8f2" opacity="0.8"/>
+  <rect x="10" y="86" width="140" height="3" rx="1.5" fill="#f8f8f2" opacity="0.8"/>
+  <rect x="10" y="96" width="60" height="3" rx="1.5" fill="#8be9fd"/>
+  <rect x="10" y="180" width="6" height="9" fill="#f8f8f2"/>
+</svg>
