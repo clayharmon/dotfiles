@@ -1,6 +1,9 @@
 # ~/.config/fish/config.fish
 # Everything the shell needs is in this file. Universal variables
 # (fish_variables) hold nothing but fish's own bookkeeping, so chezmoi sees it all.
+# (Exception: on Linux the tide prompt keeps its settings there; `tide configure`.)
+# Shared by macOS and Linux: OS-specific parts check `uname`, and tools are
+# guarded with `command -q`, so a machine without them still gets a working shell.
 
 # PATH. One call keeps this order at the front; nested shells do not duplicate it.
 fish_add_path -g \
@@ -24,11 +27,22 @@ fish_add_path -g \
 set -gx EDITOR nvim
 set -gx VIRTUAL_ENV_DISABLE_PROMPT true
 
+# Read man pages in nvim: colors, / search, K or Ctrl-] follows a reference
+# like printf(3), Ctrl-o goes back, gO shows the outline.
+set -gx MANPAGER 'nvim +Man!'
+
 # macOS-only exports. fish_add_path above already skips directories that do not exist.
 if test (uname) = Darwin
     set -gx ANDROID_HOME $HOME/Library/Android/sdk
     set -gx JAVA_HOME /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
     set -gx --path PKG_CONFIG_PATH /opt/homebrew/opt/ncurses/lib/pkgconfig
+end
+
+# Linux-only exports.
+if test (uname) = Linux
+    # Docker API clients (docker-compose, testcontainers, ...) talk to rootless
+    # podman's socket (systemctl --user podman.socket).
+    set -gx DOCKER_HOST unix://$XDG_RUNTIME_DIR/podman/podman.sock
 end
 
 # API keys are not exported at startup. Run `secrets` in a shell that needs them.
@@ -64,10 +78,15 @@ if status is-interactive
     abbr -a v nvim
     abbr -a vim nvim
 
-    # Replacements keep their names.
-    alias ls="eza --icons"
-    alias l="eza -la --icons --git"
-    alias ll="eza -l --icons --git"
-    alias tree="eza --tree --icons --level=2"
-    alias cat="bat"
+    # Replacements keep their names, only where they're installed.
+    if command -q eza
+        alias ls="eza --icons"
+        alias l="eza -la --icons --git"
+        alias ll="eza -l --icons --git"
+        alias tree="eza --tree --icons --level=2"
+    end
+    command -q bat; and alias cat="bat"
+else
+    # Scripts and non-shell launches still find mise's runtimes through its shims.
+    command -q mise; and mise activate fish --shims | source
 end

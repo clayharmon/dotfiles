@@ -1,0 +1,11 @@
+{{- /* chezmoi:modify-template */ -}}
+{{- /*
+  Own only the statusLine key of ~/.claude/settings.json. Everything else in
+  that file (permissions, plugins, model) stays per-machine and untouched.
+*/ -}}
+{{- $settings := dict -}}
+{{- if .chezmoi.stdin | trim -}}
+{{-   $settings = fromJson .chezmoi.stdin -}}
+{{- end -}}
+{{- $settings = setValueAtPath "statusLine" (dict "type" "command" "command" "~/.claude/statusline.sh") $settings -}}
+{{ toPrettyJson $settings }}
