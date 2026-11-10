@@ -1,5 +1,10 @@
+{{- /* herdr keeps the first binding of a chord and disables later ones, so a cmd+i in local.toml has to drop bdi below. */ -}}
+{{- $local := joinPath .chezmoi.homeDir ".config/herdr/local.toml" -}}
+{{- $localToml := "" -}}
+{{- if stat $local }}{{ $localToml = include $local | trim }}{{ end -}}
 # ~/.config/herdr/config.toml
 # Only overrides live here. `herdr --default-config` prints the rest.
+# Machine-local additions go in local.toml; chezmoi appends it at the end.
 # Check:  herdr config check
 # Apply:  herdr server reload-config
 onboarding = false
@@ -46,6 +51,7 @@ command = "lazygit"
 width = "90%"
 height = "90%"
 
+{{ if not (contains "\"cmd+i\"" $localToml) -}}
 # bdi (beady-eye): the beads tree for the focused pane's project, with each
 # claimed bead's live herdr pane. Reads the project under the pane's cwd; no config.
 [[keys.command]]
@@ -55,6 +61,7 @@ command = "bdi"
 width = "90%"
 height = "90%"
 
+{{ end -}}
 # reviewr: code-review pane. <plugin_id>.<action_id>. Toggle shows or hides it.
 [[keys.command]]
 key = ["prefix+d", "cmd+shift+r"]
@@ -66,3 +73,7 @@ command = "persiyanov.reviewr.toggle"
 key = ["prefix+f", "cmd+shift+e"]
 type = "plugin_action"
 command = "herdr-file-viewer.open-file-viewer"
+{{- if $localToml }}
+
+{{ $localToml }}
+{{- end }}

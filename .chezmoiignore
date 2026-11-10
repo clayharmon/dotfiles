@@ -18,6 +18,10 @@ README.md
 # Per-machine git identities and url rewrites, included from ~/.gitconfig.
 .config/git/
 
+# Machine-local herdr keys and kitty maps, pulled in by config.toml.tmpl and kitty.conf.
+.config/herdr/local.toml
+.config/kitty/local.conf
+
 # herdr-app rewrites these on every start; mods only need their own code.
 .config/herdr-app/**/gpui-kit.d.ts
 .config/herdr-app/**/jsconfig.json
