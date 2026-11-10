@@ -16,6 +16,9 @@ agent_panel_sort = "priority"
 [ui.toast]
 delivery = "herdr"
 
+[ui.sidebar.agents.rows_by_agent]
+claude = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"]]
+
 [keys]
 # The cmd chords below arrive from kitty over the kitty keyboard protocol.
 # ~/.config/kitty/kitty.conf maps each one to no_op so kitty passes it through
@@ -32,6 +35,8 @@ next_tab           = ["prefix+n", "cmd+l"]
 switch_tab         = "cmd+1..9"
 next_workspace     = ["prefix+]", "cmd+j"]
 previous_workspace = ["prefix+[", "cmd+k"]
+next_agent         = ["prefix+a", "cmd+shift+j"]         # agent panel order: blocked first
+previous_agent     = ["prefix+shift+a", "cmd+shift+k"]
 
 # lazygit in a popup over the current tab.
 [[keys.command]]
