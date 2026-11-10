@@ -1,3 +1,9 @@
+-- No plugins here need remote-plugin hosts; skip probing for them at startup.
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 require("clay.set")
 require("clay.remap")
 
@@ -8,7 +14,7 @@ if not vim.uv.fs_stat(lazypath) then
     "clone",
     "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable",
+    "--branch=stable", -- latest stable release
     lazypath,
   })
 end
@@ -16,34 +22,14 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup("clay.plugins")
 
--- Add Mason bin to PATH so vim.lsp can find installed servers
-vim.env.PATH = vim.fn.stdpath("data") .. "/mason/bin:" .. vim.env.PATH
-
--- LSP overrides (nvim-lspconfig provides the defaults via lsp/*.lua,
--- mason-lspconfig calls vim.lsp.enable() automatically)
-local capabilities = require("blink.cmp").get_lsp_capabilities()
-
--- Apply blink capabilities to all servers
-vim.lsp.config("*", { capabilities = capabilities })
-
--- ruby_lsp comes from Mason (mason/bin is on PATH above). mise exec picks the
--- Ruby that .ruby-version or mise.toml names for the project.
-vim.lsp.config("ruby_lsp", {
-    cmd = { "mise", "exec", "--", "ruby-lsp" },
-})
-vim.lsp.enable("ruby_lsp")
+-- Built-in undotree (Neovim 0.12+), loaded after lazy so its rtp reset keeps it.
+if pcall(vim.cmd.packadd, "nvim.undotree") then
+    vim.keymap.set("n", "<leader>u", function() require("undotree").open() end)
+end
 
 vim.filetype.add({
     extension = {
         mdx = "mdx",
-    },
-    pattern = {
-        -- chezmoi templates: highlight based on inner file type
-        [".*%.sh%.tmpl"] = "bash",
-        [".*%.rb%.tmpl"] = "ruby",
-        [".*%.fish%.tmpl"] = "fish",
-        [".*%.toml%.tmpl"] = "toml",
-        [".*%.conf%.tmpl"] = "conf",
     },
 })
 vim.treesitter.language.register("markdown", "mdx")

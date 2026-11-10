@@ -1,26 +1,29 @@
 return {
-    -- Fuzzy finder (replaces telescope -- faster, less overhead)
     {
-        "ibhagwan/fzf-lua",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
+        "nvim-telescope/telescope.nvim",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+        },
         config = function()
-            local fzf = require('fzf-lua')
-            fzf.setup({
-                winopts = {
-                    preview = { default = "bat" },
-                },
-                files = {
-                    fd_opts = "--type f --hidden --follow --exclude .git --exclude node_modules",
-                },
-            })
+          local telescope = require('telescope')
+          local builtin = require('telescope.builtin')
 
-            vim.keymap.set('n', '<leader>pd', fzf.files, {})
-            vim.keymap.set('n', '<leader>pf', fzf.git_files, {})
-            vim.keymap.set('n', '<leader>ps', fzf.grep, {})
-            vim.keymap.set('n', '<leader>pg', fzf.live_grep, {})
-            vim.keymap.set('n', '<leader>pb', fzf.buffers, {})
-            vim.keymap.set('n', '<leader>ph', fzf.helptags, {})
-            vim.keymap.set('n', '<leader>pe', fzf.diagnostics_workspace, {})
+          telescope.setup({
+              defaults = {
+                  file_ignore_patterns = { "node_modules", ".git/" },
+              },
+          })
+
+          -- Load fzf extension for better performance
+          pcall(telescope.load_extension, 'fzf')
+
+          vim.keymap.set('n', '<leader>pd', builtin.find_files, {})
+          vim.keymap.set('n', '<leader>pf', builtin.git_files, {})
+          vim.keymap.set('n', '<leader>ps', function()
+              builtin.grep_string({ search = vim.fn.input("Grep > ") });
+          end)
+          vim.keymap.set('n', '<leader>pg', builtin.live_grep, {})
         end
     },
     {
@@ -33,42 +36,49 @@ return {
             vim.cmd.colorscheme("dracula")
         end
     },
+    -- nvim-treesitter `main`: it only installs parsers + queries; Neovim does the
+    -- highlighting itself. Needs the tree-sitter CLI (pacman: tree-sitter-cli,
+    -- brew: tree-sitter-cli) and a C compiler. Does not support lazy-loading.
     {
         "nvim-treesitter/nvim-treesitter",
         branch = "main",
         lazy = false,
         build = ":TSUpdate",
         config = function()
-            require('nvim-treesitter').setup({})
             require('nvim-treesitter').install({
-                "ruby", "javascript", "typescript", "c", "lua", "vim",
-                "vimdoc", "rust", "nix", "markdown", "markdown_inline",
-                "json", "yaml", "toml", "html", "css", "bash", "fish",
+                -- systems
+                "c", "make", "go", "gomod", "rust", "toml",
+                -- shell / config
+                "bash", "fish", "lua", "vim", "vimdoc", "query", "json", "yaml",
+                -- web / rails (embedded_template = ERB; html/css are injected into it)
+                "ruby", "embedded_template", "html", "css",
+                "javascript", "typescript", "tsx", "jsdoc",
+                "python",
+                -- prose / git
+                "markdown", "markdown_inline", "diff", "gitcommit",
             })
 
-            vim.api.nvim_create_autocmd('FileType', {
+            vim.api.nvim_create_autocmd("FileType", {
                 callback = function(args)
+                    -- no-op for filetypes without an installed parser
                     pcall(vim.treesitter.start, args.buf)
                 end,
             })
         end
     },
-    -- Harpoon 2 (rewritten by ThePrimeagen)
     {
-        "ThePrimeagen/harpoon",
-        branch = "harpoon2",
-        dependencies = { "nvim-lua/plenary.nvim" },
+        "theprimeagen/harpoon",
         config = function()
-            local harpoon = require("harpoon")
-            harpoon:setup()
+            local mark = require("harpoon.mark")
+            local ui = require("harpoon.ui")
 
-            vim.keymap.set("n", "<leader>a", function() harpoon:list():add() end)
-            vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+            vim.keymap.set("n", "<leader>a", mark.add_file)
+            vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu)
 
-            vim.keymap.set("n", "<leader>h", function() harpoon:list():select(1) end)
-            vim.keymap.set("n", "<leader>j", function() harpoon:list():select(2) end)
-            vim.keymap.set("n", "<C-n>", function() harpoon:list():select(3) end)
-            vim.keymap.set("n", "<C-s>", function() harpoon:list():select(4) end)
+            vim.keymap.set("n", "<leader>h", function() ui.nav_file(1) end)
+            vim.keymap.set("n", "<leader>j", function() ui.nav_file(2) end)
+            vim.keymap.set("n", "<C-n>", function() ui.nav_file(3) end)
+            vim.keymap.set("n", "<C-s>", function() ui.nav_file(4) end)
         end
     },
     {
@@ -88,17 +98,12 @@ return {
             })
         end
     },
-    -- Markdown rendered in the buffer. Replaces markdown-preview.nvim (needed
-    -- npm) and the glow popup (needed tmux). Toggle with <leader>mp.
     {
         'MeanderingProgrammer/render-markdown.nvim',
-        ft = { 'markdown' },
         dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
         opts = {},
-        keys = {
-            { '<leader>mp', '<cmd>RenderMarkdown toggle<cr>', desc = 'Toggle markdown rendering' },
-        },
     },
+    -- Modern file explorer (Primeagen & TJ recommended)
     {
         'stevearc/oil.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -112,12 +117,7 @@ return {
             vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
         end
     },
-    {
-        'mbbill/undotree',
-        config = function()
-            vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
-        end
-    },
+    -- Git signs in the gutter
     {
         'lewis6991/gitsigns.nvim',
         opts = {
@@ -130,7 +130,50 @@ return {
             },
         },
     },
+    -- Auto-detect indentation (simple and useful)
     {
         'tpope/vim-sleuth',
+    },
+    -- AI chat/inline edits through Claude Code
+    {
+        "olimorris/codecompanion.nvim",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-treesitter/nvim-treesitter",
+            "nvim-telescope/telescope.nvim",
+        },
+       config = function()
+            local use_bedrock = os.getenv("CLAUDE_CODE_USE_BEDROCK")
+
+            -- Build adapter config based on environment
+            local adapter_config = {}
+            if not use_bedrock then
+                adapter_config.env = {
+                    CLAUDE_CODE_OAUTH_TOKEN = os.getenv("CLAUDE_CODE_OAUTH_TOKEN")
+                }
+            end
+
+            require("codecompanion").setup({
+                version = "v17.33.0",
+                ignore_warnings = true,
+                adapters = {
+                    http = {
+                        claude_code = function()
+                            return require("codecompanion.adapters").extend("claude_code", adapter_config)
+                        end,
+                    }
+                },
+                strategies = {
+                    chat = {
+                        adapter = "claude_code",
+                    },
+                    inline = {
+                        adapter = "claude_code",
+                    },
+                },
+            })
+            vim.keymap.set("n", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>")
+            vim.keymap.set("v", "<leader>cc", "<cmd>CodeCompanionChat Toggle<cr>")
+        end,
     },
 }

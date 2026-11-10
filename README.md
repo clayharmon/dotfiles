@@ -88,3 +88,24 @@ committed; copy it to a new work machine by hand.
 
 `~/.claude/settings.json`. Claude Code rewrites it (plugins, accepted prompts,
 effort) and it differs per machine, so it is set up by hand once per machine.
+
+## neovim language servers
+
+The nvim config enables a language server only when its binary is on PATH, so
+a machine without them still opens files fine. To get Ruby, Python and
+TypeScript/JavaScript (C, Go and Rust come with their toolchains):
+
+```
+brew install neovim tree-sitter-cli uv     # macOS; nvim 0.12+ (Arch: pacman)
+uv tool install basedpyright
+uv tool install ruff
+npm i -g --prefix ~/.local typescript@6 typescript-language-server vscode-langservers-extracted
+```
+
+- ruby-lsp: the mise `postinstall` hook installs it for each new Ruby. For a
+  Ruby that's already installed: `gem install ruby-lsp --no-document`.
+- `typescript@6`, not latest: TypeScript 7 (the Go rewrite) has no tsserver,
+  and ts_ls needs one for files outside a project. Projects use their own.
+- Everything lands in `~/.local/bin`, which the fish config puts on PATH.
+- Formatting is F3. Prettier runs only when the project has its own config
+  and `node_modules`; otherwise the language server formats.
