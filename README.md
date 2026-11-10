@@ -1,7 +1,17 @@
 # dotfiles
 
-Managed with [chezmoi](https://www.chezmoi.io). fish, kitty, herdr, neovim,
-starship, atuin. On macOS: AeroSpace, sketchybar, borders, Karabiner, Hammerspoon.
+Managed with [chezmoi](https://www.chezmoi.io). Three groups, set in `.chezmoiignore`:
+
+- **shared:** fish, kitty, mise, neovim, the Claude Code status line
+- **macOS:** herdr, starship, atuin, AeroSpace, sketchybar, borders, Karabiner,
+  Hammerspoon, git identity, the setup scripts
+- **Linux (Arch + Hyprland):** hypr, waybar, mako, fuzzel, tmux, gdb, podman,
+  ncspot, a few fish functions
+
+Shared files handle the OS difference in one of three ways: a runtime check
+(`uname` in fish), kitty's `include ${KITTY_OS}.conf`, or a chezmoi template
+(`mise/config.toml.tmpl`, `fish_plugins.tmpl`). `~/.claude/settings.json` is
+not tracked; `dot_claude/modify_settings.json` sets only its `statusLine` key.
 
 ## first time setup
 
@@ -16,21 +26,18 @@ chezmoi init --apply clayharmon
 ### arch linux
 
 ```
-sudo pacman -S chezmoi git ruby
+sudo pacman -S chezmoi git
 chezmoi init --apply clayharmon
 ```
 
-### fedora
+On Linux this only writes the config files. No scripts run, and packages are
+installed by hand.
 
-```
-sudo dnf install chezmoi git ruby
-chezmoi init --apply clayharmon
-```
+`chezmoi init --apply` writes the dotfiles. On macOS it then runs the scripts
+below in order. Scripts 02 to 05 need `sudo` at some point, so run it in a
+terminal you are watching.
 
-`chezmoi init --apply` writes the dotfiles, then runs the scripts below in order.
-Scripts 02 to 05 need `sudo` at some point, so run it in a terminal you are watching.
-
-## what the scripts do
+## what the scripts do (macOS)
 
 1. `01-bootstrap`: Homebrew (macOS), mise, node/python/ruby, rustup
 2. `02-packages`: CLI tools, kitty, herdr, Claude Code, apps. macOS also gets AeroSpace, sketchybar, borders

@@ -1,0 +1,2 @@
+# Read before gdb prints anything: skip the license banner (same as gdb -q).
+set startup-quietly on

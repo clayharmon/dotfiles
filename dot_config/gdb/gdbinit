@@ -1,0 +1,18 @@
+# ~/.config/gdb/gdbinit: read on every gdb start (gdb has no end-of-line comments).
+# Try:  ccs prog.c && gdb -tui ./a.out    then: break main, run, n, s, p var, layout split
+
+# Same syntax as the `asm` fish function
+set disassembly-flavor intel
+# No "--Type <RET> for more--", no "are you sure?" on run/quit
+set pagination off
+set confirm off
+# Print structs one field per line
+set print pretty on
+
+set history save on
+set history size 10000
+set history filename ~/.local/state/gdb/history
+
+# Arch sets DEBUGINFOD_URLS, so gdb asks on every start whether to download
+# debug info. Off means no prompt and no network. Turn it on to step into glibc's own source.
+set debuginfod enabled off

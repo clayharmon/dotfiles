@@ -1,0 +1,7 @@
+# Stable DRM names for the T430's two GPUs, so Hyprland's AQ_DRM_DEVICES
+# doesn't depend on card0/card1 numbering (which flips when booted docked).
+#   igpu = Intel HD 4000 (00:02.0)        - always present, primary renderer
+#   dgpu = NVIDIA NVS 5400M / GF108 (01:00.0) - only when booted on the dock
+# Install: sudo install -m644 ~/.config/hypr/70-gpu-names.rules /etc/udev/rules.d/
+SUBSYSTEM=="drm", KERNEL=="card*", KERNELS=="0000:00:02.0", SYMLINK+="dri/igpu"
+SUBSYSTEM=="drm", KERNEL=="card*", KERNELS=="0000:01:00.0", SYMLINK+="dri/dgpu"

@@ -1,0 +1,16 @@
+# mako notifications: Dracula, square, top-right.
+font=JetBrains Mono 11
+background-color=#1e1f28
+text-color=#f8f8f2
+border-color=#50fa7b
+border-size=1
+border-radius=0
+padding=10
+default-timeout=5000
+
+[urgency=low]
+border-color=#44475a
+
+[urgency=critical]
+border-color=#ff5555
+default-timeout=0

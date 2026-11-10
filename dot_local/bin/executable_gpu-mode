@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+# gpu-mode: switch the T430's coreboot hybrid-graphics mode (a CMOS option)
+# and reboot to apply it.
+#
+#   gpu-mode dock     "Dual Graphics"   NVIDIA GF108 on: the dock's DisplayPorts
+#                                       work. Runs hot (~96°C) and never sleeps.
+#   gpu-mode mobile   "Integrated Only" NVIDIA off: cooler, better battery;
+#                                       dock DisplayPorts are dead.
+#   gpu-mode status   show the CMOS setting and whether the NVIDIA chip is up
+#
+# The NVIDIA chip only appears/disappears at boot (coreboot powers the PCIe
+# slot on or off), hence the reboot. Recovery if Linux won't come up: change
+# hybrid_graphics_mode in nvramcui from the firmware boot menu.
+set -euo pipefail
+
+opt=hybrid_graphics_mode
+
+read_mode() {
+    # nvramtool prints either "VALUE" or "name = VALUE" depending on version
+    sudo nvramtool -r "$opt" | sed 's/^.*= *//'
+}
+
+nvidia_up() {
+    lspci -d 10de: 2>/dev/null | grep -q 'VGA'
+}
+
+case "${1:-status}" in
+    dock)   want="Dual Graphics" ;;
+    mobile) want="Integrated Only" ;;
+    status)
+        echo "CMOS $opt: $(read_mode)"
+        if nvidia_up; then echo "NVIDIA GF108:  on (this boot)"; else echo "NVIDIA GF108:  off (this boot)"; fi
+        exit 0
+        ;;
+    -h|--help)
+        sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
+        exit 0
+        ;;
+    *)
+        echo "usage: gpu-mode [dock|mobile|status]" >&2
+        exit 2
+        ;;
+esac
+
+cur=$(read_mode)
+if [[ $cur == "$want" ]]; then
+    echo "$opt already: $want"
+else
+    sudo nvramtool -w "$opt=$want"
+    new=$(read_mode)
+    if [[ $new != "$want" ]]; then
+        echo "write failed: $opt is still '$new'" >&2
+        exit 1
+    fi
+    echo "$opt: $cur -> $new"
+fi
+
+# Only offer a reboot if this boot doesn't already match the requested mode.
+if { [[ $want == "Dual Graphics" ]] && nvidia_up; } || { [[ $want == "Integrated Only" ]] && ! nvidia_up; }; then
+    echo "This boot already matches; no reboot needed."
+    exit 0
+fi
+
+read -rp "Reboot now to apply? [y/N] " ans
+if [[ $ans == [yY]* ]]; then
+    systemctl reboot
+else
+    echo "Takes effect on the next boot."
+fi

@@ -1,13 +1,43 @@
 # Repo docs, not a dotfile.
 README.md
 
+# Three groups. Shared: fish, kitty, mise, nvim, and the Claude status line.
+# Everything else belongs to one OS and is ignored on the other.
+
 {{- if ne .chezmoi.os "darwin" }}
-# macOS-only configs
+# macOS-only
+.chezmoiscripts/darwin/**
 .config/aerospace/
 .config/borders/
 .config/sketchybar/
 .config/karabiner/
+.config/herdr/
+.config/herdr-app/
+.config/atuin/
+.config/starship.toml
+.config/fish/functions/pipaste.fish
+.config/fish/functions/secrets.fish
 .hammerspoon/
+.claude/CLAUDE.md
+.gitconfig
+{{- end }}
+
+{{- if ne .chezmoi.os "linux" }}
+# Linux-only (Arch + Hyprland)
+.config/hypr/
+.config/waybar/
+.config/mako/
+.config/fuzzel/
+.config/gdb/
+.config/containers/
+.config/pacman/
+.config/tmux/
+.config/ncspot/
+.config/mimeapps.list
+.config/fish/functions/fish_greeting.fish
+.config/fish/functions/fish_mode_prompt.fish
+.local/bin/gpu-mode
+.local/share/applications/
 {{- end }}
 
 {{- if not .work }}
