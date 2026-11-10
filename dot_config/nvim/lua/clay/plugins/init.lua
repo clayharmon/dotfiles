@@ -91,10 +91,45 @@ return {
         'nvim-lualine/lualine.nvim',
         dependencies = { 'nvim-tree/nvim-web-devicons' },
         config = function()
+            -- vim.lsp.status() pops the progress ring buffer, so a statusline
+            -- polling it blanks between reports. Keep the latest per token.
+            local lsp_progress = {}
+            vim.api.nvim_create_autocmd("LspProgress", {
+                callback = function(ev)
+                    local value = ev.data.params.value
+                    if type(value) ~= "table" then return end
+                    local key = ev.data.client_id .. ":" .. tostring(ev.data.params.token)
+                    if value.kind == "end" then
+                        lsp_progress[key] = nil
+                    else
+                        local entry = lsp_progress[key] or {}
+                        entry.title = value.title or entry.title
+                        entry.message = value.message
+                        entry.percentage = value.percentage
+                        lsp_progress[key] = entry
+                    end
+                    require('lualine').refresh({ place = { 'statusline' } })
+                end,
+            })
+
+            local function lsp_progress_status()
+                local parts = {}
+                for _, p in pairs(lsp_progress) do
+                    local detail = p.percentage and (p.percentage .. "%") or p.message
+                    parts[#parts + 1] = detail and ((p.title or "") .. " " .. detail) or (p.title or "")
+                end
+                table.sort(parts)
+                -- lualine passes this through as statusline syntax: a bare % is E539
+                return (table.concat(parts, " | "):gsub("%%", "%%%%"))
+            end
+
             require('lualine').setup({
                 options = {
                     theme = 'dracula-nvim'
-                }
+                },
+                sections = {
+                    lualine_x = { lsp_progress_status, 'encoding', 'fileformat', 'filetype' },
+                },
             })
         end
     },
