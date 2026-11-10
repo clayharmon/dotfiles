@@ -10,3 +10,9 @@ compile = false
 node = "lts"
 python = "3.12"
 ruby = "3.4"
+
+[hooks]
+# ruby-lsp is installed outside project bundles (it composes its own), so it has
+# to be reinstalled for each new Ruby. --no-document dodges an rdoc 7/8 conflict
+# in the mise Ruby that makes `gem install` exit 1 while still installing.
+postinstall = "command -v gem >/dev/null && { gem list -i ruby-lsp >/dev/null 2>&1 || gem install ruby-lsp --no-document; }"
