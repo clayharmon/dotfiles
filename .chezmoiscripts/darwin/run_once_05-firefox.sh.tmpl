@@ -12,6 +12,9 @@ POLICY_DIR="/Library/Application Support/Mozilla/policies"
 POLICY_DIR="/etc/firefox/policies"
 {{ end -}}
 
+# The policy file is system-wide and needs sudo. A user who cannot sudo skips
+# it and still gets user.js below.
+if id -Gn | grep -Eqw 'admin|wheel|sudo'; then
 echo "Installing Firefox policies..."
 sudo mkdir -p "$POLICY_DIR"
 sudo tee "$POLICY_DIR/policies.json" > /dev/null << 'POLICY'
@@ -40,6 +43,9 @@ sudo tee "$POLICY_DIR/policies.json" > /dev/null << 'POLICY'
   }
 }
 POLICY
+else
+  echo "This user cannot sudo, skipping the system-wide Firefox policies"
+fi
 
 # ── user.js ───────────────────────────────────────────────────────
 {{ if eq .chezmoi.os "darwin" -}}
