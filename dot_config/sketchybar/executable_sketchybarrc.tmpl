@@ -92,6 +92,13 @@ sketchybar --add item space_trigger left \
 
 ##### Right side #####
 
+sketchybar --add item account right \
+  --set account \
+    icon="" \
+    icon.color=$PURPLE \
+    label="$(id -un)" \
+    label.color=$FOREGROUND
+
 sketchybar --add item clock right \
   --set clock \
     icon="" \
