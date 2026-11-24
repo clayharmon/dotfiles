@@ -6,20 +6,16 @@
 set -e
 
 # ── policies.json ─────────────────────────────────────────────────
-{{ if eq .chezmoi.os "darwin" -}}
-POLICY_DIR="/Library/Application Support/Mozilla/policies"
-{{ else if eq .chezmoi.os "linux" -}}
-POLICY_DIR="/etc/firefox/policies"
-{{ end -}}
-
 # The policy file is system-wide and needs sudo. A user who cannot sudo skips
 # it and still gets user.js below.
 if id -Gn | grep -Eqw 'admin|wheel|sudo'; then
 echo "Installing Firefox policies..."
-sudo mkdir -p "$POLICY_DIR"
-sudo tee "$POLICY_DIR/policies.json" > /dev/null << 'POLICY'
+POLICY_TMP=$(mktemp)
+trap 'rm -f "$POLICY_TMP" "$POLICY_TMP.plist"' EXIT
+cat > "$POLICY_TMP" << 'POLICY'
 {
   "policies": {
+    "EnterprisePoliciesEnabled": true,
     "ExtensionSettings": {
       "uBlock0@raymondhill.net": {
         "install_url": "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi",
@@ -43,6 +39,15 @@ sudo tee "$POLICY_DIR/policies.json" > /dev/null << 'POLICY'
   }
 }
 POLICY
+{{ if eq .chezmoi.os "darwin" -}}
+# Firefox on macOS reads policies.json only from inside the app bundle, which
+# an update replaces. Managed preferences keyed by bundle ID survive updates.
+plutil -extract policies xml1 -o "$POLICY_TMP.plist" "$POLICY_TMP"
+sudo install -m 644 "$POLICY_TMP.plist" /Library/Preferences/org.mozilla.firefoxdeveloperedition.plist
+sudo rm -rf "/Library/Application Support/Mozilla/policies"
+{{ else if eq .chezmoi.os "linux" -}}
+sudo install -D -m 644 "$POLICY_TMP" /etc/firefox/policies/policies.json
+{{ end -}}
 else
   echo "This user cannot sudo, skipping the system-wide Firefox policies"
 fi
