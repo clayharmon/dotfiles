@@ -44,16 +44,19 @@ terminal you are watching.
 2. `02-packages`: everything in `~/.config/homebrew/Brewfile` through `brew bundle`, then Claude Code
 3. `03-shell-setup`: fish as login shell, fisher plugins, herdr completions and plugins
 4. `04-macos-defaults`: Dock, Finder, keyboard, hidden menu bar, starts the sketchybar, borders and herdr services
-5. `05-firefox`: Firefox Developer Edition policies and `user.js`. On a new machine it fails until Firefox has made a profile: open Firefox Developer Edition once, quit it, run `chezmoi apply`
-6. `06-backup-agent`: loads the nightly backup LaunchAgent once `~/.config/backup/env` exists
+5. `05-backup-agent`: loads the nightly backup LaunchAgent once `~/.config/backup/env` exists
+6. `06-firefox`: Firefox Developer Edition policies and `user.js`. It fails, and reruns on the next `chezmoi apply`, in two cases:
+   - Firefox has no profile yet. Open Firefox Developer Edition once and quit it.
+   - macOS blocks the terminal from reading `~/Library/Application Support/Firefox`. Allow the terminal in System Settings > Privacy & Security > Full Disk Access and restart it.
 
 Scripts 01 and 02 run before any file is written. Scripts 03 to 06 run after,
 because they read files this repo writes: 03 needs `fish_plugins`, and 04 starts
-sketchybar and herdr, which need their configs.
+sketchybar and herdr, which need their configs. Firefox is last, so its
+failure blocks nothing else.
 
-Scripts 01 and 03 to 05 are `run_once_`: chezmoi runs each one the first time it
-sees that exact content. Scripts 02 and 06 are `run_onchange_`: 02 reruns when the
-Brewfile changes and 06 when the plist changes. On a machine that is already set
+Scripts 01, 03, 04 and 06 are `run_once_`: chezmoi runs each one the first time it
+sees that exact content. Scripts 02 and 05 are `run_onchange_`: 02 reruns when the
+Brewfile changes and 05 when the plist changes. On a machine that is already set
 up, skip them all with `chezmoi apply --exclude=scripts`.
 
 ## packages

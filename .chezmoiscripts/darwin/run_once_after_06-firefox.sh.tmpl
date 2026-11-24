@@ -56,6 +56,16 @@ FF_DIR="$HOME/.mozilla/firefox"
 (command -v firefox-developer-edition || command -v firefox-dev) >/dev/null && FF_INSTALLED=1
 {{ end -}}
 
+# macOS can block a terminal from reading another app's data folder. The folder
+# still exists, but grep and find fail quietly, and the lookups below would
+# then report "no profile yet" for a profile that is there.
+if [ -d "$FF_DIR" ] && ! ls "$FF_DIR" >/dev/null 2>&1; then
+  echo "macOS is blocking this terminal from reading $FF_DIR" >&2
+  echo "Allow the terminal in System Settings > Privacy & Security > Full Disk Access," >&2
+  echo "restart it, then run: chezmoi apply" >&2
+  exit 1
+fi
+
 # installs.ini names the profile each install actually launches. The profile
 # *named* dev-edition-default in profiles.ini can be a stale one left behind
 # by a profile reset or the profile manager.

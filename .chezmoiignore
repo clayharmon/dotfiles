@@ -62,7 +62,7 @@ docs/
 .config/systemd/
 .local/bin/backup
 Library/
-.chezmoiscripts/darwin/06-backup-agent.sh
+.chezmoiscripts/darwin/05-backup-agent.sh
 {{- end }}
 
 # Per-machine git identities and url rewrites, included from ~/.gitconfig.
