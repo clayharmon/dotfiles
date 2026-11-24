@@ -10,8 +10,6 @@ brew "fzf"
 
 brew "neovim"
 brew "tree-sitter-cli"
-brew "lua-language-server"
-brew "gopls"
 
 brew "eza"
 brew "bat"
@@ -31,12 +29,27 @@ brew "chezmoi"
 brew "mise"
 
 brew "herdr"
-brew "beads"
 brew "codeforbreakfast/tap/bdi"
 brew "aichat"
+brew "age"
 brew "pngpaste"
 
-brew "age"
+brew "felixkratz/formulae/sketchybar"
+brew "felixkratz/formulae/borders"
+
+cask "kitty"
+cask "karabiner-elements"
+cask "hammerspoon"
+cask "nikitabobko/tap/aerospace"
+cask "font-jetbrains-mono-nerd-font"
+{{ if .work -}}
+cask "pr-monitor"
+{{ else -}}
+
+brew "lua-language-server"
+brew "gopls"
+brew "beads"
+
 brew "sops"
 brew "bitwarden-cli"
 brew "restic"
@@ -53,18 +66,7 @@ brew "chamber"
 brew "doctl"
 brew "overmind"
 
-brew "felixkratz/formulae/sketchybar"
-brew "felixkratz/formulae/borders"
-
-cask "kitty"
 cask "herdr-app"
-cask "karabiner-elements"
-cask "hammerspoon"
-cask "nikitabobko/tap/aerospace"
-cask "font-jetbrains-mono-nerd-font"
-{{ if .work -}}
-cask "pr-monitor"
-{{ else -}}
 cask "firefox@developer-edition"
 cask "google-chrome"
 cask "bitwarden"

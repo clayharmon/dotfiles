@@ -23,8 +23,15 @@ case "${1:-run}" in
     restic backup --dry-run --exclude-file "$conf/excludes" --exclude-caches "${sources[@]}"
     ;;
   run)
-    restic backup --exclude-file "$conf/excludes" --exclude-caches --tag "$(hostname -s)" "${sources[@]}"
+    # restic exits 3 when a snapshot was saved but some file could not be read.
+    # Keep pruning in that case, and still report 3 so the log shows it.
+    status=0
+    restic backup --exclude-file "$conf/excludes" --exclude-caches --tag "$(hostname -s)" "${sources[@]}" || status=$?
+    if [ "$status" -ne 0 ] && [ "$status" -ne 3 ]; then
+      exit "$status"
+    fi
     restic forget --keep-daily 30 --keep-weekly 26 --keep-monthly 24 --prune
+    exit "$status"
     ;;
   *)
     restic "$@"

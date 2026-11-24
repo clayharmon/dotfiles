@@ -127,7 +127,9 @@ copied to a new machine by hand.
 
 `chezmoi init` asks once whether this is a work machine and writes `work = true`
 into `~/.config/chezmoi/chezmoi.toml`. That flag switches: work git identity, the
-PR Monitor sketchybar item, no Firefox/Docker/Bitwarden/Spotify, no herdr plugins.
+PR Monitor sketchybar item, no herdr plugins, and the short Brewfile (29 formulae
+and 6 casks, with no personal apps or tools). A work machine also gets no
+`~/code`, `~/money`, `~/run` or `~/docs` folders and no backup job.
 
 This repo is public, so nothing employer-specific is in it. On a work machine
 `CLAUDE.md` imports `~/.claude/CLAUDE.work.md`, a local file that is never

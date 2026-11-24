@@ -52,6 +52,19 @@ Library/
 .config/sketchybar/plugins/pr_monitor.sh
 {{- end }}
 
+{{- if .work }}
+# Personal machines only: the data folders and the backup job.
+code/
+money/
+run/
+docs/
+.config/backup/
+.config/systemd/
+.local/bin/backup
+Library/
+.chezmoiscripts/darwin/06-backup-agent.sh
+{{- end }}
+
 # Per-machine git identities and url rewrites, included from ~/.gitconfig.
 .config/git/
 
