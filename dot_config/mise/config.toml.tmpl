@@ -15,6 +15,7 @@ node = "lts"
 {{- if eq .chezmoi.os "darwin" }}
 python = "3.12"
 ruby = "3.4"
+uv = "0.13.9"
 {{- else }}
 # Python comes from uv on Linux; mise only provides uv itself.
 ruby = "3.4.8"

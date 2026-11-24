@@ -153,8 +153,10 @@ The nvim config enables a language server only when its binary is on PATH, so
 a machine without them still opens files fine. To get Ruby, Python and
 TypeScript/JavaScript (C, Go and Rust come with their toolchains):
 
+On macOS, neovim and tree-sitter-cli come from the Brewfile and uv from mise.
+On Arch, install all three with pacman (nvim 0.12+).
+
 ```
-brew install neovim tree-sitter-cli uv     # macOS; nvim 0.12+ (Arch: pacman)
 uv tool install basedpyright
 uv tool install ruff
 npm i -g --prefix ~/.local typescript@6 typescript-language-server vscode-langservers-extracted
