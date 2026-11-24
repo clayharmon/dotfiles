@@ -5,6 +5,10 @@ set -e
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+if ! command -v claude >/dev/null 2>&1; then
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
+
 # Only the owner of /opt/homebrew can install into it.
 if [ ! -O /opt/homebrew ]; then
   echo "packages: this user does not own /opt/homebrew, skipping brew bundle"
@@ -20,7 +24,3 @@ done
 brew bundle --file=- <<'BREWFILE'
 {{ includeTemplate "dot_config/homebrew/Brewfile.tmpl" . }}
 BREWFILE
-
-if ! command -v claude >/dev/null 2>&1; then
-  curl -fsSL https://claude.ai/install.sh | bash
-fi
