@@ -1,0 +1,9 @@
+[Unit]
+Description=restic backup of code, money, run and docs
+ConditionPathExists=%h/.config/backup/env
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/backup run

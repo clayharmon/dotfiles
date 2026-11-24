@@ -1,6 +1,10 @@
 # Repo docs, not a dotfile.
 README.md
 
+# Machine-local backup credentials, copied to a new machine by hand.
+.config/backup/env
+.config/backup/password
+
 # Three groups. Shared: fish, kitty, mise, nvim, and the Claude status line.
 # Everything else belongs to one OS and is ignored on the other.
 
@@ -20,6 +24,8 @@ README.md
 .hammerspoon/
 .claude/CLAUDE.md
 .gitconfig
+.config/homebrew/
+Library/
 {{- end }}
 
 {{- if ne .chezmoi.os "linux" }}
@@ -33,6 +39,7 @@ README.md
 .config/pacman/
 .config/tmux/
 .config/ncspot/
+.config/systemd/
 .config/mimeapps.list
 .config/fish/functions/fish_greeting.fish
 .config/fish/functions/fish_mode_prompt.fish

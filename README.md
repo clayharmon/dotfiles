@@ -31,7 +31,8 @@ chezmoi init --apply clayharmon
 ```
 
 On Linux this only writes the config files. No scripts run, and packages are
-installed by hand.
+installed by hand. Turn on the nightly backup with
+`systemctl --user enable --now backup.timer` once `~/.config/backup/env` exists.
 
 `chezmoi init --apply` writes the dotfiles. On macOS it then runs the scripts
 below in order. Scripts 02 to 05 need `sudo` at some point, so run it in a
@@ -40,14 +41,62 @@ terminal you are watching.
 ## what the scripts do (macOS)
 
 1. `01-bootstrap`: Homebrew (macOS), mise, node/python/ruby, rustup
-2. `02-packages`: CLI tools, kitty, herdr, Claude Code, apps. macOS also gets AeroSpace, sketchybar, borders
+2. `02-packages`: everything in `~/.config/homebrew/Brewfile` through `brew bundle`, then Claude Code
 3. `03-shell-setup`: fish as login shell, fisher plugins, herdr completions and plugins
 4. `04-macos-defaults`: Dock, Finder, keyboard, hidden menu bar, starts the sketchybar, borders and herdr services
 5. `05-firefox`: Firefox Developer Edition policies and `user.js`. On a new machine it fails until Firefox has made a profile: open Firefox Developer Edition once, quit it, run `chezmoi apply`
+6. `06-backup-agent`: loads the nightly backup LaunchAgent once `~/.config/backup/env` exists
 
-Scripts are `run_once_`: chezmoi runs each one the first time it sees that exact
-content. Editing a script makes it run again on the next `chezmoi apply`. On a
-machine that is already set up, skip them with `chezmoi apply --exclude=scripts`.
+Scripts 01 and 03 to 05 are `run_once_`: chezmoi runs each one the first time it
+sees that exact content. Scripts 02 and 06 are `run_onchange_`: 02 reruns when the
+Brewfile changes and 06 when the plist changes. On a machine that is already set
+up, skip them all with `chezmoi apply --exclude=scripts`.
+
+## packages
+
+`~/.config/homebrew/Brewfile` is the list of every Homebrew formula and app
+this machine should have. `HOMEBREW_BUNDLE_FILE` points at it, so these work
+from any directory:
+
+```
+brew bundle                    # install what is listed
+brew bundle cleanup            # print what is installed but not listed
+brew bundle cleanup --force    # remove it
+```
+
+To keep a new tool, add a line to `dot_config/homebrew/Brewfile.tmpl`. Project
+tools belong in that project's `mise.toml`, not here.
+
+## layout
+
+```
+~/code        git repos
+~/money       ledger, taxes, statements
+~/run         GPX and FIT files, training plans
+~/docs        documents and books
+~/Downloads   inbox
+```
+
+chezmoi creates the first four with mode 700, so only you can read them. The
+home folder itself is not managed: run `chmod 700 ~` once.
+
+## backup
+
+`backup` snapshots the folders in `~/.config/backup/paths` to a restic
+repository, skips the names in `~/.config/backup/excludes`, then prunes to 30
+daily, 26 weekly and 24 monthly snapshots. It runs at 04:00 from a LaunchAgent
+on macOS and a systemd user timer on Linux.
+
+```
+backup              # snapshot now
+backup dry          # show what a snapshot would add
+backup snapshots    # any other word is passed to restic
+```
+
+`~/.config/backup/env` holds the repository address and keys, and
+`~/.config/backup/password` holds the repository password. Neither is in this
+repo. Copy both to a new machine by hand. Without the password the repository
+cannot be read.
 
 ## daily workflow
 

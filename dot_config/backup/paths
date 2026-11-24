@@ -1,0 +1,13 @@
+code
+money
+run
+docs
+.ssh
+.gnupg
+.config
+.aws
+.kube
+.claude
+.gitconfig
+.local/share/chezmoi
+.local/share/atuin

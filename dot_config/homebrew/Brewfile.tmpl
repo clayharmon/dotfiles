@@ -1,0 +1,80 @@
+tap "nikitabobko/tap"
+tap "felixkratz/formulae"
+tap "codeforbreakfast/tap"
+
+brew "fish"
+brew "starship"
+brew "zoxide"
+brew "atuin"
+brew "fzf"
+
+brew "neovim"
+brew "tree-sitter-cli"
+brew "lua-language-server"
+brew "gopls"
+
+brew "eza"
+brew "bat"
+brew "fd"
+brew "ripgrep"
+brew "sd"
+brew "xh"
+brew "dust"
+brew "jq"
+brew "glow"
+brew "git-delta"
+
+brew "git"
+brew "gh"
+brew "lazygit"
+brew "chezmoi"
+brew "mise"
+
+brew "herdr"
+brew "beads"
+brew "codeforbreakfast/tap/bdi"
+brew "aichat"
+brew "pngpaste"
+
+brew "age"
+brew "sops"
+brew "bitwarden-cli"
+brew "restic"
+# The Hermes backup still writes to rclone:gdrive. Drop this line once that
+# repository moves to B2.
+brew "rclone"
+
+brew "ledger"
+brew "poppler"
+brew "postgresql@15"
+
+brew "awscli"
+brew "chamber"
+brew "doctl"
+brew "overmind"
+
+brew "felixkratz/formulae/sketchybar"
+brew "felixkratz/formulae/borders"
+
+cask "kitty"
+cask "herdr-app"
+cask "karabiner-elements"
+cask "hammerspoon"
+cask "nikitabobko/tap/aerospace"
+cask "font-jetbrains-mono-nerd-font"
+{{ if .work -}}
+cask "pr-monitor"
+{{ else -}}
+cask "firefox@developer-edition"
+cask "google-chrome"
+cask "bitwarden"
+cask "claude"
+cask "spotify"
+cask "tailscale-app"
+cask "protonvpn"
+cask "proton-drive"
+cask "utm"
+cask "textmate"
+cask "docker-desktop"
+cask "calibre"
+{{ end -}}

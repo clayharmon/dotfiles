@@ -12,14 +12,6 @@ fish_add_path -g \
     $HOME/.gem/ruby/3.4.0/bin \
     /opt/homebrew/opt/openjdk/bin \
     /opt/homebrew/opt/postgresql@15/bin \
-    /opt/homebrew/opt/icu4c@77/sbin \
-    /opt/homebrew/opt/icu4c@77/bin \
-    /opt/homebrew/opt/flex/bin \
-    /opt/homebrew/opt/make/libexec/gnubin \
-    /opt/homebrew/opt/bison/bin \
-    /opt/homebrew/opt/gnu-sed/libexec/gnubin \
-    /opt/homebrew/opt/gawk/libexec/gnubin \
-    /opt/gcc-14.2.0-3-aarch64/bin \
     /opt/homebrew/bin \
     $HOME/.docker/bin \
     $HOME/.local/bin
@@ -36,6 +28,7 @@ if test (uname) = Darwin
     set -gx ANDROID_HOME $HOME/Library/Android/sdk
     set -gx JAVA_HOME /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
     set -gx --path PKG_CONFIG_PATH /opt/homebrew/opt/ncurses/lib/pkgconfig
+    set -gx HOMEBREW_BUNDLE_FILE $HOME/.config/homebrew/Brewfile
 end
 
 # Linux-only exports.
@@ -53,7 +46,9 @@ if status is-interactive
     fish_vi_key_bindings
 
     # Runtimes: node, python, ruby from ~/.config/mise/config.toml
-    command -q mise; and mise activate fish | source
+    # Homebrew's fish vendor conf already activates mise. A second activation
+    # costs about 33 ms per shell, so skip it when the hook is defined.
+    command -q mise; and not functions -q __mise_env_eval; and mise activate fish | source
 
     # Prompt, cd, history. Each guarded so a half-bootstrapped machine still gets a prompt.
     # fzf.fish (conf.d) bound ctrl+r at startup. Re-run its installer without

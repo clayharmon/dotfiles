@@ -6,14 +6,18 @@ set -e
 
 {{ if eq .chezmoi.os "darwin" -}}
 # Install Homebrew
-if ! command -v brew &>/dev/null; then
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif ! command -v brew &>/dev/null; then
   echo "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# Install mise
-brew install mise
+# Install mise. Only the owner of /opt/homebrew can install into it.
+if [ -O /opt/homebrew ]; then
+  brew install mise
+fi
 
 {{ else if eq .chezmoi.os "linux" -}}
 # Install mise

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+conf="${XDG_CONFIG_HOME:-$HOME/.config}/backup"
+export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:$PATH"
+
+set -a
+. "$conf/env"
+set +a
+
+sources=()
+while IFS= read -r line; do
+  [ -n "$line" ] || continue
+  if [ -e "$HOME/$line" ]; then
+    sources+=("$HOME/$line")
+  else
+    echo "backup: skipping missing $HOME/$line" >&2
+  fi
+done < "$conf/paths"
+
+case "${1:-run}" in
+  dry)
+    restic backup --dry-run --exclude-file "$conf/excludes" --exclude-caches "${sources[@]}"
+    ;;
+  run)
+    restic backup --exclude-file "$conf/excludes" --exclude-caches --tag "$(hostname -s)" "${sources[@]}"
+    restic forget --keep-daily 30 --keep-weekly 26 --keep-monthly 24 --prune
+    ;;
+  *)
+    restic "$@"
+    ;;
+esac

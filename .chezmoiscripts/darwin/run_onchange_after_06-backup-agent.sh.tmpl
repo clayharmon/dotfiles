@@ -1,0 +1,18 @@
+#!/bin/bash
+# Plist hash: {{ include "Library/LaunchAgents/me.clayharmon.backup.plist.tmpl" | sha256sum }}
+# Reloads the nightly backup agent whenever its plist changes. The agent stays
+# unloaded until ~/.config/backup/env exists, because that file holds the
+# repository credentials and is copied to a new machine by hand.
+set -e
+
+plist="$HOME/Library/LaunchAgents/me.clayharmon.backup.plist"
+domain="gui/$(id -u)"
+
+mkdir -p "$HOME/Library/Logs/backup"
+launchctl bootout "$domain/me.clayharmon.backup" 2>/dev/null || true
+
+if [ -f "$HOME/.config/backup/env" ]; then
+  launchctl bootstrap "$domain" "$plist"
+else
+  echo "backup: ~/.config/backup/env is missing, so the nightly agent was not loaded"
+fi

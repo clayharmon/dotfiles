@@ -1,0 +1,26 @@
+#!/bin/bash
+# The Brewfile is embedded so this script reruns whenever the list changes, and
+# so it works on a first apply, before ~/.config/homebrew/Brewfile exists.
+set -e
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Only the owner of /opt/homebrew can install into it.
+if [ ! -O /opt/homebrew ]; then
+  echo "packages: this user does not own /opt/homebrew, skipping brew bundle"
+  exit 0
+fi
+
+# Third-party taps need `brew trust` on Homebrew 4.7+.
+for tap in nikitabobko/tap felixkratz/formulae codeforbreakfast/tap; do
+  brew tap "$tap"
+  brew trust "$tap" >/dev/null 2>&1 || true
+done
+
+brew bundle --file=- <<'BREWFILE'
+{{ includeTemplate "dot_config/homebrew/Brewfile.tmpl" . }}
+BREWFILE
+
+if ! command -v claude >/dev/null 2>&1; then
+  curl -fsSL https://claude.ai/install.sh | bash
+fi

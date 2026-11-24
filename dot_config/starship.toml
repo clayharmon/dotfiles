@@ -26,6 +26,3 @@ vimcmd_symbol = "[\\$](green)"
 
 [cmd_duration]
 disabled = true
-
-[nix_shell]
-disabled = true
