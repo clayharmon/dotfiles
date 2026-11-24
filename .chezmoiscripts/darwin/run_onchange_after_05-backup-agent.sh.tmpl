@@ -1,5 +1,8 @@
 #!/bin/bash
 # Plist hash: {{ include "Library/LaunchAgents/me.clayharmon.backup.plist.tmpl" | sha256sum }}
+# Credentials present: {{ if stat (joinPath .chezmoi.homeDir ".config/backup/env") }}yes{{ else }}no{{ end }}
+# The line above changes when ~/.config/backup/env appears, so the next
+# `chezmoi apply` reruns this script and loads the agent.
 # Reloads the nightly backup agent whenever its plist changes. The agent stays
 # unloaded until ~/.config/backup/env exists, because that file holds the
 # repository credentials and is copied to a new machine by hand.
