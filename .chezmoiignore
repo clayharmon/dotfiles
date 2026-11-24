@@ -5,7 +5,7 @@ README.md
 .config/backup/env
 .config/backup/password
 
-# Three groups. Shared: fish, kitty, mise, nvim, and the Claude status line.
+# Three groups. Shared: fish, kitty, mise, nvim, podman (containers), and the Claude status line.
 # Everything else belongs to one OS and is ignored on the other.
 
 {{- if ne .chezmoi.os "darwin" }}
@@ -35,7 +35,6 @@ Library/
 .config/mako/
 .config/fuzzel/
 .config/gdb/
-.config/containers/
 .config/pacman/
 .config/tmux/
 .config/ncspot/

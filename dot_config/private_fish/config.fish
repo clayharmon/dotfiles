@@ -13,7 +13,6 @@ fish_add_path -g \
     /opt/homebrew/opt/openjdk/bin \
     /opt/homebrew/opt/postgresql@15/bin \
     /opt/homebrew/bin \
-    $HOME/.docker/bin \
     $HOME/.local/bin
 
 set -gx EDITOR nvim
@@ -29,6 +28,9 @@ if test (uname) = Darwin
     set -gx JAVA_HOME /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home
     set -gx --path PKG_CONFIG_PATH /opt/homebrew/opt/ncurses/lib/pkgconfig
     set -gx HOMEBREW_BUNDLE_FILE $HOME/.config/homebrew/Brewfile
+    # Docker API clients (docker-compose, testcontainers, ...) talk to the
+    # podman machine's socket. It exists only while the machine is running.
+    set -gx DOCKER_HOST unix://(string trim -r -c / $TMPDIR)/podman/podman-machine-default-api.sock
 end
 
 # Linux-only exports.
