@@ -47,6 +47,10 @@ terminal you are watching.
 5. `05-firefox`: Firefox Developer Edition policies and `user.js`. On a new machine it fails until Firefox has made a profile: open Firefox Developer Edition once, quit it, run `chezmoi apply`
 6. `06-backup-agent`: loads the nightly backup LaunchAgent once `~/.config/backup/env` exists
 
+Scripts 01 and 02 run before any file is written. Scripts 03 to 06 run after,
+because they read files this repo writes: 03 needs `fish_plugins`, and 04 starts
+sketchybar and herdr, which need their configs.
+
 Scripts 01 and 03 to 05 are `run_once_`: chezmoi runs each one the first time it
 sees that exact content. Scripts 02 and 06 are `run_onchange_`: 02 reruns when the
 Brewfile changes and 06 when the plist changes. On a machine that is already set
