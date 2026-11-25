@@ -1,11 +1,13 @@
 {{- /* chezmoi:modify-template */ -}}
 {{- /*
-  Own only the statusLine key of ~/.claude/settings.json. Everything else in
-  that file (permissions, plugins, model) stays per-machine and untouched.
+  Own two keys of ~/.claude/settings.json: statusLine, and
+  env.CLAUDE_CODE_PLUGIN_DIRS, which loads the dracula-t430 mod. Everything
+  else in that file (permissions, plugins, model) stays per-machine and untouched.
 */ -}}
 {{- $settings := dict -}}
 {{- if .chezmoi.stdin | trim -}}
 {{-   $settings = fromJson .chezmoi.stdin -}}
 {{- end -}}
 {{- $settings = setValueAtPath "statusLine" (dict "type" "command" "command" "~/.claude/statusline.sh") $settings -}}
+{{- $settings = setValueAtPath "env.CLAUDE_CODE_PLUGIN_DIRS" (printf "%s/.claude/mods/dracula-t430" .chezmoi.homeDir) $settings -}}
 {{ toPrettyJson $settings }}
